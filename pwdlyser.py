@@ -173,13 +173,13 @@ if __name__ == "__main__":
      if args.freq_anal is None:
      
          # Headers
-         output_pass("------------------------------","------------------------------","-----------------------------------")
+         output_pass("-" * 30,"-" * 30,"-" * 30)
          output_pass("Username","Password","Description")
-         output_pass("------------------------------","------------------------------","-----------------------------------")
+         output_pass("-" * 30,"-" * 30,"-" * 30)
      else:
-         output_pass("------------------------------","------------------------------","")
+         output_pass("-" * 30,"-" * 30,"")
          output_pass("Password","Frequency","")
-         output_pass("------------------------------","------------------------------","")
+         output_pass("-" * 30,"-" * 30,"")
  
      # Cycle through output list
      for item in full_list:
