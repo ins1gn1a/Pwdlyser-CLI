@@ -179,5 +179,5 @@ if __name__ == "__main__":
              check_basic_search(user,pwd)
 
          # Common Passwords
-         if args.common_pass is not None:
+         if args.common_pass is True:
              check_common_pass(user,pwd)
