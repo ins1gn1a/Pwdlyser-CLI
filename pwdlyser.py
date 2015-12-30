@@ -57,18 +57,21 @@ def check_min_length(password,min):
 # Check for org name (reused code from below, laziness)
 def check_org_name(user,password,org):
     x = 0
+    pwd_unleet = password
     leet_list = reverse_leet_speak()
     for line in leet_list:
-        char_change = line.split(",")
+        if "," in line:
+            char_change = line.split(",")
+        else:
+            continue
         try:
-            pwd_unleet = (password.replace(char_change[0],char_change[1])).lower()
+            pwd_unleet = (pwd_unleet.replace(char_change[0],char_change[1])).lower()
             search = org.lower()
-
-            if (pwd_unleet != pwd) and (search in pwd_unleet) and (x == 0):
-                output_pass(user,password,"Variation of organisation name " + org)
-                x += 1
         except:
             continue
+    if (search in pwd_unleet): # and (x == 0):
+        output_pass(user,password,"Variation of org name " + org)
+        #x += 1
 
 # Imports leet config file and processes
 def reverse_leet_speak():
@@ -79,18 +82,21 @@ def reverse_leet_speak():
 # Checks for variation of input based upon removal of leetspeak
 def check_basic_search(user,password):
     x = 0
+    pwd_unleet = password
     leet_list = reverse_leet_speak()
     for line in leet_list:
-        char_change = line.split(",")
+        if "," in line:
+            char_change = line.split(",")
+        else:
+            continue
         try:
-            pwd_unleet = (password.replace(char_change[0],char_change[1])).lower()
+            pwd_unleet = (pwd_unleet.replace(char_change[0],char_change[1])).lower()
             search = args.basic_search.lower()
-                   
-            if (pwd_unleet != pwd) and (search in pwd_unleet) and (x == 0):
-                output_pass(user,password,"Variation of " + args.basic_search)
-                x += 1
         except:
             continue
+    if (search in pwd_unleet): # and (x == 0):
+        output_pass(user,password,"Variation of " + args.basic_search)
+        #x += 1
 
 # Common password check from import list - List can be appended to
 def check_common_pass(user,password):
