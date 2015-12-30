@@ -1,32 +1,34 @@
 #! /usr/bin/env python3
 
-# Password analyser
-# 2) outputs to CSV for review with excel, but also to stdout in graph
-# 3) functionalities include: 
-# 	identify domain admins/admins/etc from an imported list (take admin list, highlight any of those)
+''' 
+To Do:
+
+* Identify domain admins/admins/etc from an imported list (take admin list, highlight any of those).
+* Fix -oR reporting stdout output.
+* Dollar dollar bill y'all
+'''
 
 import sys, os
 import argparse
 from string import digits
 import re
-from operator import itemgetter
+from collections import Counter
 
 parser = argparse.ArgumentParser(description='Password Analyser')
 parser.add_argument('-p','--pass-list',dest='pass_list',help='Enter the path to the list of passwords, either in the format of passwords, or username:password.',required=True)
 parser.add_argument('-a','--admin-list',dest='admin_list',help='Enter the path to the list of admin accounts that will be highlighted if they are seen within the password list',required=False)
 parser.add_argument('-o','--org-name',dest='org_name',help='Enter the organisation name to identify any users that will be using a variation of the word for their password. Note: False Positives are possible',required=False)
 parser.add_argument('-l','--length',dest='min_length',help='Display passwords that do not meet the minimum length',type=int)
-#parser.add_argument('-i','--input-type',dest='input_type',help='Type of input for the password list. "-i 1" for username:password, "-i 2" for password.',type=int,required=True)
 parser.add_argument('-A','--all',dest='print_all',help='Print only usernames',action='store_true')
 parser.add_argument('-s','--search',dest='basic_search',help='Run a basic search using a keyword. Non-alpha characters will be stripped, i.e. syst3m will become systm (although this will be compared against the same stripped passwords')
 parser.add_argument('-oR',dest='output_report',help='Output format set for reporting with "- " prefix',action='store_true',default=False)
 parser.add_argument('-c','--common',dest='common_pass',help='Check against list of common passwords',action='store_true',default=False)
+parser.add_argument('-f','--freq',dest='freq_anal',help='Perform frequency analysis',required=False,type=int)
 args = parser.parse_args()
 
 pass_list = args.pass_list
 admin_list = args.admin_list
 organisation = args.org_name
-#input_type = args.input_type
 issue_old = None
 
 # Input function
@@ -138,29 +140,44 @@ def delimit_list(list):
     sorted_list = sorted(out_list, key=lambda x: x[1])
     return (sorted_list)
 
+# Perform frequency analysis for [num]
+def check_frequency_analysis(full_list,length):
+    z = 0
+    pwd_list = []
+    words = Counter()
+
+    for pwd in full_list:
+        x = pwd[1]
+        pwd_list.append(x)
+
+    words.update(pwd_list)
+    wordfreq = (words.most_common())
+
+    for pair in wordfreq:
+        if z <= length:
+            output_pass(pair[0],str(pair[1]),"")
+            z += 1
+
 # Run main stuff
 if __name__ == "__main__":
 
      # Retrieve list
      full_list = (delimit_list(pass_list))
      y = 0
-     # Headers
-     output_pass("------------------------------","------------------------------","-----------------------------------")
-     output_pass("Username","Password","Description")
-     output_pass("------------------------------","------------------------------","-----------------------------------")
- 
 
+     if args.freq_anal is None:
+     
+         # Headers
+         output_pass("------------------------------","------------------------------","-----------------------------------")
+         output_pass("Username","Password","Description")
+         output_pass("------------------------------","------------------------------","-----------------------------------")
+     else:
+         output_pass("------------------------------","------------------------------","-----------------------------------")
+         output_pass("Password","Frequency","")
+         output_pass("------------------------------","------------------------------","-----------------------------------")
+ 
      # Cycle through output list
      for item in full_list:
-         #if input_type == 1:
-         #    user = item[0]
-         #else:
-         #    user = "NONE"
-         #if (input_type == 2):
-         #    pwd = item[0]
-         #else:
-         #    pwd = item[1]
-
          # removed above code as pointless to use only passwords
          user = item[0]
          pwd = item[1]
@@ -187,3 +204,6 @@ if __name__ == "__main__":
          # Common Passwords
          if args.common_pass is True:
              check_common_pass(user,pwd)
+ 
+     if args.freq_anal is not None:
+         check_frequency_analysis(full_list,args.freq_anal)
