@@ -9,22 +9,24 @@ import sys, os
 import argparse
 from string import digits
 import re
+from operator import itemgetter
 
 parser = argparse.ArgumentParser(description='Password Analyser')
 parser.add_argument('-p','--pass-list',dest='pass_list',help='Enter the path to the list of passwords, either in the format of passwords, or username:password.',required=True)
 parser.add_argument('-a','--admin-list',dest='admin_list',help='Enter the path to the list of admin accounts that will be highlighted if they are seen within the password list',required=False)
-parser.add_argument('-n','--org-name',dest='org_name',help='Enter the organisation name to identify any users that will be using a variation of the word for their password. Note: False Positives are possible',required=False)
-parser.add_argument('--length',dest='min_length',help='Display passwords that do not meet the minimum length',type=int)
-parser.add_argument('-i',dest='input_type',help='Type of input for the password list. "-i 1" for username:password, "-i 2" for password.',type=int,required=True)
-parser.add_argument('-A',dest='print_all',help='Print only usernames',action='store_true')
-parser.add_argument('-s',dest='basic_search',help='Run a basic search using a keyword. Non-alpha characters will be stripped, i.e. syst3m will become systm (although this will be compared against the same stripped passwords')
+parser.add_argument('-o','--org-name',dest='org_name',help='Enter the organisation name to identify any users that will be using a variation of the word for their password. Note: False Positives are possible',required=False)
+parser.add_argument('-l','--length',dest='min_length',help='Display passwords that do not meet the minimum length',type=int)
+#parser.add_argument('-i','--input-type',dest='input_type',help='Type of input for the password list. "-i 1" for username:password, "-i 2" for password.',type=int,required=True)
+parser.add_argument('-A','--all',dest='print_all',help='Print only usernames',action='store_true')
+parser.add_argument('-s','--search',dest='basic_search',help='Run a basic search using a keyword. Non-alpha characters will be stripped, i.e. syst3m will become systm (although this will be compared against the same stripped passwords')
 parser.add_argument('-oR',dest='output_report',help='Output format set for reporting with "- " prefix',action='store_true',default=False)
+parser.add_argument('-c','--common',dest='common_pass',help='Check against list of common passwords',action='store_true',default=False)
 args = parser.parse_args()
 
 pass_list = args.pass_list
 admin_list = args.admin_list
 organisation = args.org_name
-input_type = args.input_type
+#input_type = args.input_type
 issue_old = None
 
 # Input function
@@ -33,12 +35,14 @@ def import_file_to_list(path):
         out_var = file.read().splitlines()
     return out_var
 
-# Do stuff -- NOT YET1
+# Output to STDOUT
 def output_pass(username,password,issue):
+        
     if args.output_report:
-        if issue_old != issue:
-            print ("\n" + issue + ":")
-        print ("- " + username)
+         if (issue is not None):
+             print ("\n" + issue + ":")
+         print ("- " + username)
+
     else:
         # Username:Pass
         print (username.ljust(30),end=":".ljust(5),flush=True)
@@ -66,6 +70,7 @@ def check_org_name(user,password,org):
         except:
             continue
 
+# Imports leet config file and processes
 def reverse_leet_speak():
     with open("pwd_leet.conf") as leetconf:
         leet_list = leetconf.read().splitlines()
@@ -87,34 +92,72 @@ def check_basic_search(user,password):
         except:
             continue
 
+# Common password check from import list - List can be appended to
+def check_common_pass(user,password):
+    x = 0
+    out_issue = ""
+    leet_list = reverse_leet_speak()
+    pwd_unleet = password
+
+    # Import common passwords
+    with open ("pwd_common.conf") as passcommon:
+        pass_list = passcommon.read().splitlines()
+
+    # Loop through common passwords list
+    for common in pass_list:
+        common = common.lower()
+
+        # Loop through each leet_speak change in imported list
+        for line in leet_list:
+            char_change = line.split(",")
+
+            # Amend each 
+            try:
+                if char_change[0] in password:
+                     pwd_unleet = (pwd_unleet.replace(char_change[0],char_change[1])).lower()
+            except:
+                continue
+
+        if (common in pwd_unleet) and (x == 0):
+            out_issue = "Variation of " + common
+            output_pass(user,password,out_issue)
+            x += 1
+
 # output and delimit input list
 def delimit_list(list):
     list = import_file_to_list(list)
     out_list = []
     for list_entry in list:
         out_list.append(list_entry.split(":"))
-    return out_list
+    sorted_list = sorted(out_list, key=lambda x: x[1])
+    return (sorted_list)
 
 # Run main stuff
 if __name__ == "__main__":
 
      # Retrieve list
-     x = (delimit_list(pass_list))
-
+     full_list = (delimit_list(pass_list))
+     y = 0
      # Headers
+     output_pass("------------------------------","------------------------------","-----------------------------------")
      output_pass("Username","Password","Description")
-     
-     # Cycle through output list
-     for item in x:
-         if input_type == 1:
-             user = item[0]
-         else:
-             user = "NONE"
-         if (input_type == 2):
-             pwd = item[0]
-         else:
-             pwd = item[1]
+     output_pass("------------------------------","------------------------------","-----------------------------------")
+ 
 
+     # Cycle through output list
+     for item in full_list:
+         #if input_type == 1:
+         #    user = item[0]
+         #else:
+         #    user = "NONE"
+         #if (input_type == 2):
+         #    pwd = item[0]
+         #else:
+         #    pwd = item[1]
+
+         # removed above code as pointless to use only passwords
+         user = item[0]
+         pwd = item[1]
 
          # Print everything regardless
          if args.print_all:
@@ -130,6 +173,11 @@ if __name__ == "__main__":
          if organisation is not None:
              issue_old = None
              check_org_name(user,pwd,organisation)
-             
+
+         # Basic search             
          if args.basic_search is not None:
              check_basic_search(user,pwd)
+
+         # Common Passwords
+         if args.common_pass is not None:
+             check_common_pass(user,pwd)
