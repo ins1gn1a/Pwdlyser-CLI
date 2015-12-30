@@ -156,7 +156,7 @@ def check_frequency_analysis(full_list,length):
     wordfreq = (words.most_common())
 
     for pair in wordfreq:
-        if z <= length:
+        if z < length:
             output_pass(pair[0],str(pair[1]),"")
             z += 1
 
