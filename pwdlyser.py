@@ -137,7 +137,10 @@ def delimit_list(list):
     out_list = []
     for list_entry in list:
         out_list.append(list_entry.split(":"))
-    sorted_list = sorted(out_list, key=lambda x: x[1])
+    try:
+        sorted_list = sorted(out_list, key=lambda x: x[1])
+    except:
+        sys.exit("ERROR: Cannot delimit list. Ensure format is Username:Password.")
     return (sorted_list)
 
 # Perform frequency analysis for [num]
@@ -183,6 +186,7 @@ if __name__ == "__main__":
          # removed above code as pointless to use only passwords
          user = item[0]
          pwd = item[1]
+
          if pwd == "":
              pwd = "*******BLANK-PASS*******"
 
