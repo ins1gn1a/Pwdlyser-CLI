@@ -53,7 +53,7 @@ def output_pass(username,password,issue):
 
 # Check for inputted min length
 def check_min_length(password,min):
-    if len(password) < min:
+    if (len(password) < min) or (password == "*******BLANK-PASS*******"):
         output_pass(user,pwd,"Length < " + str(args.min_length))
 
 # Check for org name (reused code from below, laziness)
@@ -148,6 +148,8 @@ def check_frequency_analysis(full_list,length):
 
     for pwd in full_list:
         x = pwd[1]
+        if x == "":
+            x = "*******BLANK-PASS*******"
         pwd_list.append(x)
 
     words.update(pwd_list)
@@ -181,6 +183,8 @@ if __name__ == "__main__":
          # removed above code as pointless to use only passwords
          user = item[0]
          pwd = item[1]
+         if pwd == "":
+             pwd = "*******BLANK-PASS*******"
 
          # Print everything regardless
          if args.print_all:
