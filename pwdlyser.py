@@ -302,7 +302,7 @@ if __name__ == "__main__":
             check_basic_search(user,pwd,args.basic_search)
 
         # Common Passwords
-        if args.common_pass is True:
+        if args.common_pass:
             check_common_pass(user,pwd)
 
         if args.exact_search is not None:
@@ -314,7 +314,7 @@ if __name__ == "__main__":
         if args.admin_path is not None:
             check_admin(user,pwd)
             
-        if args.user_as_pass is not None:
+        if args.user_as_pass:
             check_user_as_pass(user,pwd)
 
 #    if args.shared_pass:
