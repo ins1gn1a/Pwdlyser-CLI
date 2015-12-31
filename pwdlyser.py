@@ -40,12 +40,19 @@ issue_old = None
 
 rows, columns = os.popen('stty size', 'r').read().split()
 
-banner =          "\n  #####  #    # #####  #      #   #  ####  ###### ##### \n"  
+v_1 = "1"
+v_2 = "0"
+v_3 = "0"
+
+version = v_1 + "." + v_2 + "." + v_3
+
+banner =        "\n  #####  #    # #####  #      #   #  ####  ###### ##### \n"  
 banner = banner + "  #    # #    # #    # #       # #  #      #      #    # \n"  
 banner = banner + "  #    # #    # #    # #        #    ####  #####  #    # \n"  
 banner = banner + "  #####  # ## # #    # #        #        # #      #####  \n"  
 banner = banner + "  #      ##  ## #    # #        #   #    # #      #   #  \n"  
-banner = banner + "  #      #    # #####  ######   #    ####  ###### #    # \n"  
+banner = banner + "  #      #    # #####  ######   #    ####  ###### #    # \n\n"  
+banner = banner + "  ---- Password analysis & reporting tool -- v" + version + " ----\n"
 
 
 # Input function
