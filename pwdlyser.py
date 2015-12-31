@@ -70,33 +70,39 @@ def check_admin(user,pwd):
 # Output to STDOUT
 def output_pass(username,password,issue):
         
-    if args.output_report:
-         if (issue is not None):
-             print ("\n" + issue + ":")
-         print ("- " + username)
-
+    # Username:Pass
+    print (username.ljust(30),end=":".ljust(5),flush=True)
+    if issue == "":
+        end_delim = ""
     else:
-        # Username:Pass
-        print (username.ljust(30),end=":".ljust(5),flush=True)
-        if issue == "":
-            end_delim = ""
-        else:
-            end_delim = ":"
-        print (password.ljust(35),end=end_delim.ljust(5),flush=True)
-        print (issue)
+        end_delim = ":"
+    print (password.ljust(35),end=end_delim.ljust(5),flush=True)
+    print (issue)
+
+def print_report(u):
+    print ("- " + u)
 
 # Check for inputted min length
 def check_min_length(password,min):
     if (len(password) < min) or (password == "*******BLANK-PASS*******"):
-        output_pass(user,pwd,"Length < " + str(args.min_length))
+        if args.output_report:
+            print_report(user)
+        else:
+            output_pass(user,pwd,"Length < " + str(args.min_length))
 
 def check_user_search(user,password,term):
     if term.lower() in user.lower():
-        output_pass(user,password,"Username Search: " + term)
+        if args.output_report:
+            print_report(user)
+        else:
+            output_pass(user,password,"Username Search: " + term)
 
 def check_exact_search(user,password,term):
     if term in password:
-        output_pass(user,password,"Term " + term + " in password")
+        if args.output_report:
+            print_report(user)
+        else:
+            output_pass(user,password,"Term " + term + " in password")
 
 # Check for org name (reused code from below, laziness)
 def check_org_name(user,password,org):
@@ -113,9 +119,11 @@ def check_org_name(user,password,org):
             search = org.lower()
         except:
             continue
-    if (search in pwd_unleet): # and (x == 0):
-        output_pass(user,password,"Variation of org name " + org)
-        #x += 1
+    if (search in pwd_unleet):
+        if args.output_report:
+            print_report(user)
+        else:
+            output_pass(user,password,"Variation of org name " + org)
 
 # Imports leet config file and processes
 def reverse_leet_speak():
@@ -142,8 +150,10 @@ def check_basic_search(user,password,search):
         except:
             continue
     if (search in pwd_unleet): # and (x == 0):
-        output_pass(user,password,"Variation of " + search)
-        #x += 1
+        if args.output_report:
+            print_report(user)
+        else:
+            output_pass(user,password,"Variation of " + search)
 
 # Common password check from import list - List can be appended to
 def check_common_pass(user,password):
@@ -172,9 +182,12 @@ def check_common_pass(user,password):
                 continue
 
         if (common in pwd_unleet) and (x == 0):
-            out_issue = "Variation of " + common
-            output_pass(user,password,out_issue)
-            x += 1
+            if args.output_report:
+                print_report(user)
+            else:
+                out_issue = "Variation of " + common
+                output_pass(user,password,out_issue)
+                x += 1
 
 # output and delimit input list
 def delimit_list(list):
@@ -266,63 +279,130 @@ if __name__ == "__main__":
     # Retrieve list
     full_list = (delimit_list(pass_list))
     y = 0
+ 
 
-    if args.freq_anal is None:
+    min_count = 0
+    common_count = 0
+    search_count = 0
+    org_count = 0
+    exact_count = 0
+    admin_count = 0
+    pass_count = 0
+
+    if args.freq_anal is None and args.output_report is False:
      
         # Headers
         output_pass("-" * 30,"-" * 30,"-" * 30)
         output_pass("Username","Password","Description")
         output_pass("-" * 30,"-" * 30,"-" * 30)
- 
-    # Cycle through output list
-    for item in full_list:
-        # removed above code as pointless to use only passwords
-        user = item[0]
-        pwd = item[1]
-        if pwd == "":
-            pwd = "*******BLANK-PASS*******"
 
-        # Print everything regardless
-        if args.print_all:
-            output_pass(user,pwd,"Not Analysed")
-            continue # Skip analysis functions below
-
-        # Check Min Length
-        if (args.min_length is not None):
-            issue_old = None
-            check_min_length(pwd,args.min_length)
-
-        # Check if Org name (or slight variation) is in list
-        if organisation is not None:
-            issue_old = None
-            check_org_name(user,pwd,organisation)
-
-        # Basic search             
-        if args.basic_search is not None:
-            check_basic_search(user,pwd,args.basic_search)
-
-        # Common Passwords
-        if args.common_pass:
-            check_common_pass(user,pwd)
-
-        if args.exact_search is not None:
-            check_exact_search(user,pwd,args.exact_search)
-
-        if args.user_search is not None:
-            check_user_search(user,pwd,args.user_search)
-
-        if args.admin_path is not None:
-            check_admin(user,pwd)
-            
-        if args.user_as_pass:
-            check_user_as_pass(user,pwd)
-
-#    if args.shared_pass:
-#        check_shared_pass(full_list)
- 
     if args.freq_anal is not None:
         output_pass("-" * 30,"-" * 30,"")
         output_pass("Password","Frequency","")
         output_pass("-" * 30,"-" * 30,"")
         
         check_frequency_analysis(full_list,args.freq_anal)
+    
+    else:
+
+        # Print everything regardless
+        if args.print_all:
+            output_pass(user,pwd,"Not Analysed")
+            sys.exit() # Skip analysis functions below
+
+        # Check Min Length
+        if (args.min_length is not None):
+            if args.output_report and min_count == 0:
+                print ("\nThe minimum length of the following passwords does not meet the required minimum of " + str(args.min_length) + " characters:")
+                min_count += 1
+            # Cycle through output list
+            for item in full_list:
+                user = item[0]
+                pwd = item[1]
+                if pwd == "":
+                    pwd = "*******BLANK-PASS*******"
+                check_min_length(pwd,args.min_length)
+
+        # Check if Org name (or slight variation) is in list
+        if organisation is not None:
+            if args.output_report and org_count == 0:
+                print ("\nThe organisation name + " + organisation + " appears within several passwords for the following accounts (within some variation):")
+                org_count += 1
+            # Cycle through output list
+            for item in full_list:
+                user = item[0]
+                pwd = item[1]
+                if pwd == "":
+                    pwd = "*******BLANK-PASS*******"
+                check_org_name(user,pwd,organisation)
+
+        # Basic search             
+        if args.basic_search is not None:
+            if args.output_report and search_count == 0:
+                print ("\nThe following user accounts were found to have a password that was some variation of the word/phrase: " + args.basic_search)
+                search_count += 1
+            # Cycle through output list
+            for item in full_list:
+                user = item[0]
+                pwd = item[1]
+                if pwd == "":
+                    pwd = "*******BLANK-PASS*******"
+                check_basic_search(user,pwd,args.basic_search)
+
+        # Common Passwords
+        if args.common_pass is True:
+            if args.output_report and common_count == 0:
+                print ("\nThe following user accounts were found to have a password that was a variation of the most common user passwords, which can include 'password', 'letmein', '123456', 'admin', 'iloveyou', 'friday', or 'qwerty':")
+                common_count += 1
+            # Cycle through output list
+            for item in full_list:
+                user = item[0]
+                pwd = item[1]
+                if pwd == "":
+                    pwd = "*******BLANK-PASS*******"
+                check_common_pass(user,pwd)
+
+        if args.exact_search is not None:
+            if args.output_report and exact_count == 0:
+                print ("\nThe following user accounts were found to have a password that contains the word/phrase " + args.exact_search + ":")
+                exact_count += 1
+            # Cycle through output list
+            for item in full_list:
+                user = item[0]
+                pwd = item[1]
+                if pwd == "":
+                    pwd = "*******BLANK-PASS*******"
+                check_exact_search(user,pwd,args.exact_search)
+
+        if args.user_search is not None:
+            check_user_search(user,pwd,args.user_search)
+
+        if args.admin_path is not None:
+            if args.output_report and admin_count == 0:
+                print ("\nThe following user accounts were identified as Administrators of various systems and were found to have weak passwords set: ")
+                admin_count += 1
+            # Cycle through output list
+            for item in full_list:
+                user = item[0]
+                pwd = item[1]
+                if pwd == "":
+                    pwd = "*******BLANK-PASS*******"
+                check_admin(user,pwd)
+            
+        if args.user_as_pass:
+            if args.output_report and pass_count == 0:
+                print ("\nThe following user accounts were found to have a variation of their username set as their account password: ")
+                pass_count += 1
+            # Cycle through output list
+            for item in full_list:
+                user = item[0]
+                pwd = item[1]
+                if pwd == "":
+                    pwd = "*******BLANK-PASS*******"
+                check_user_as_pass(user,pwd)
+
+#    if args.shared_pass:
+#        check_shared_pass(full_list)
+ 
+
+
