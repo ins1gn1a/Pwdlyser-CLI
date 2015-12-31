@@ -38,6 +38,9 @@ admin_list = args.admin_list
 organisation = args.org_name
 issue_old = None
 
+rows, columns = os.popen('stty size', 'r').read().split()
+
+
 # Input function
 def import_file_to_list(path):
     with open(path) as file:
@@ -236,6 +239,10 @@ def list_duplicates(seq):
  
 # Run main stuff
 if __name__ == "__main__":
+
+
+    if int(columns) < 110:
+        sys.exit("Warning: Resize your terminal to be at least 110 columns wide. Currently it is " + columns + " columns wide.")
 
     # Retrieve list
     full_list = (delimit_list(pass_list))
