@@ -2,6 +2,8 @@
 
 ''' 
 To Do:
+
+* Identify domain admins/admins/etc from an imported list (take admin list, highlight any of those).
 * Identify multiple shared passwords.
 * Fix -oR reporting stdout output.
 * Dollar dollar bill y'all
@@ -18,15 +20,16 @@ parser = argparse.ArgumentParser(description='Password Analyser')
 parser.add_argument('-p','--pass-list',dest='pass_list',help='Enter the path to the list of passwords, either in the format of passwords, or username:password.',required=True)
 parser.add_argument('-a','--admin-list',dest='admin_list',help='Enter the path to the list of admin accounts that will be highlighted if they are seen within the password list',required=False)
 parser.add_argument('-o','--org-name',dest='org_name',help='Enter the organisation name to identify any users that will be using a variation of the word for their password. Note: False Positives are possible',required=False)
-parser.add_argument('-l','--length',dest='min_length',help='Display passwords that do not meet the minimum length',type=int)
-parser.add_argument('-A','--all',dest='print_all',help='Print only usernames',action='store_true')
-parser.add_argument('-s','--search',dest='basic_search',help='Run a basic search using a keyword. Non-alpha characters will be stripped, i.e. syst3m will become systm (although this will be compared against the same stripped passwords')
-parser.add_argument('-oR',dest='output_report',help='Output format set for reporting with "- " prefix',action='store_true',default=False)
-parser.add_argument('-c','--common',dest='common_pass',help='Check against list of common passwords',action='store_true',default=False)
+parser.add_argument('-l','--length',dest='min_length',help='Display passwords that do not meet the minimum length',type=int,required=False)
+parser.add_argument('-A','--all',dest='print_all',help='Print only usernames',action='store_true',required=False)
+parser.add_argument('-s','--search',dest='basic_search',help='Run a basic search using a keyword. Non-alpha characters will be stripped, i.e. syst3m will become systm (although this will be compared against the same stripped passwords',required=False)
+parser.add_argument('-oR',dest='output_report',help='Output format set for reporting with "- " prefix',action='store_true',default=False,required=False)
+parser.add_argument('-c','--common',dest='common_pass',help='Check against list of common passwords',action='store_true',default=False,required=False)
 parser.add_argument('-f','--freq',dest='freq_anal',help='Perform frequency analysis',required=False,type=int)
-parser.add_argument('--exact',dest='exact_search',help='Perform a search using the exact string.')
-parser.add_argument('-u','--user',dest='user_search',help='Return usernames that match string (case insensitive)')
-parser.add_argument('--admin',dest='admin_path',help='Import line separated list of Admin usernames to check password list')
+parser.add_argument('--exact',dest='exact_search',help='Perform a search using the exact string.',required=False)
+parser.add_argument('-u','--user',dest='user_search',help='Return usernames that match string (case insensitive)',required=False)
+parser.add_argument('--admin',dest='admin_path',help='Import line separated list of Admin usernames to check password list',required=False)
+parser.add_argument('-up','--user-as-pass',dest='user_as_pass',help='Check for passwords that use part of the username',required=False,action='store_true',default=False)
 #parser.add_argument('--shared',dest='shared_pass',help='Display any reused/shared passwords.',required=False,action='store_true',default=False)
 args = parser.parse_args()
 
@@ -98,9 +101,12 @@ def reverse_leet_speak():
     with open("pwd_leet.conf") as leetconf:
         leet_list = leetconf.read().splitlines()
     return leet_list
+    
+def check_user_as_pass(user,pwd):
+    check_basic_search(user,pwd,user)
 
 # Checks for variation of input based upon removal of leetspeak
-def check_basic_search(user,password):
+def check_basic_search(user,password,search):
     x = 0
     pwd_unleet = password
     leet_list = reverse_leet_speak()
@@ -111,11 +117,11 @@ def check_basic_search(user,password):
             continue
         try:
             pwd_unleet = (pwd_unleet.replace(char_change[0],char_change[1])).lower()
-            search = args.basic_search.lower()
+            search = search.lower()
         except:
             continue
     if (search in pwd_unleet): # and (x == 0):
-        output_pass(user,password,"Variation of " + args.basic_search)
+        output_pass(user,password,"Variation of " + search)
         #x += 1
 
 # Common password check from import list - List can be appended to
@@ -267,7 +273,7 @@ if __name__ == "__main__":
 
         # Basic search             
         if args.basic_search is not None:
-            check_basic_search(user,pwd)
+            check_basic_search(user,pwd,args.basic_search)
 
         # Common Passwords
         if args.common_pass is True:
@@ -281,6 +287,9 @@ if __name__ == "__main__":
 
         if args.admin_path is not None:
             check_admin(user,pwd)
+            
+        if args.user_as_pass is not None:
+            check_user_as_pass(user,pwd)
 
 #    if args.shared_pass:
 #        check_shared_pass(full_list)
