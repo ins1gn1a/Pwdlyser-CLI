@@ -2,11 +2,8 @@
 
 ''' 
 To Do:
-
-* Identify domain admins/admins/etc from an imported list (take admin list, highlight any of those).
 * Identify multiple shared passwords.
-* Fix -oR reporting stdout output.
-* Dollar dollar bill y'all
+* Keyboard patterns: e.g. zxcdsa, asdfjkl;
 '''
 
 import sys, os
@@ -313,7 +310,7 @@ if __name__ == "__main__":
         # Check Min Length
         if (args.min_length is not None):
             if args.output_report and min_count == 0:
-                print ("\nThe minimum length of the following passwords does not meet the required minimum of " + str(args.min_length) + " characters:")
+                print ("\nThe length of the following user account passwords does not meet the required minimum of " + str(args.min_length) + " characters:")
                 min_count += 1
             # Cycle through output list
             for item in full_list:
