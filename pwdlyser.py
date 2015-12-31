@@ -2,8 +2,6 @@
 
 ''' 
 To Do:
-
-* Identify domain admins/admins/etc from an imported list (take admin list, highlight any of those).
 * Identify multiple shared passwords.
 * Fix -oR reporting stdout output.
 * Dollar dollar bill y'all
@@ -28,6 +26,7 @@ parser.add_argument('-c','--common',dest='common_pass',help='Check against list 
 parser.add_argument('-f','--freq',dest='freq_anal',help='Perform frequency analysis',required=False,type=int)
 parser.add_argument('--exact',dest='exact_search',help='Perform a search using the exact string.')
 parser.add_argument('-u','--user',dest='user_search',help='Return usernames that match string (case insensitive)')
+parser.add_argument('--admin',dest='admin_path',help='Import line separated list of Admin usernames to check password list')
 #parser.add_argument('--shared',dest='shared_pass',help='Display any reused/shared passwords.',required=False,action='store_true',default=False)
 args = parser.parse_args()
 
@@ -42,6 +41,12 @@ def import_file_to_list(path):
         out_var = file.read().splitlines()
     return out_var
 
+def check_admin(user,pwd):
+    admin_list = import_file_to_list(args.admin_path)
+    for admin in admin_list:
+        if admin.lower() in user.lower():
+            output_pass(user,pwd,"Admin: " + admin)
+
 # Output to STDOUT
 def output_pass(username,password,issue):
         
@@ -52,7 +57,7 @@ def output_pass(username,password,issue):
 
     else:
         # Username:Pass
-        print (username.ljust(50),end=":".ljust(5),flush=True)
+        print (username.ljust(30),end=":".ljust(5),flush=True)
         print (password.ljust(35),end=":".ljust(5),flush=True)
         print (issue)
 
@@ -273,6 +278,9 @@ if __name__ == "__main__":
 
         if args.user_search is not None:
             check_user_search(user,pwd,args.user_search)
+
+        if args.admin_path is not None:
+            check_admin(user,pwd)
 
 #    if args.shared_pass:
 #        check_shared_pass(full_list)
