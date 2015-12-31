@@ -6,6 +6,8 @@ I originally did intend for either passwords, username:passwords, and username:h
 
 Lists can be specified using the ```-p [path/to/file]``` argument, and should be colon delimited with username followed by password. No headers are necessary.
 
+Should you only want to analyse passwords, just enter a colon (":") before each password in the list, which will just output blank usernames.
+
 ## Usage
 There are a range of input arguments that can be used, but for a simple 'common password' search through a list use the ```-c``` argument to initiate the check. This will import the default pwd_common.conf file and use it as a basis to compare against the password list. Passwords and the common passwords are both converted to lower-case, with the inputted passwords also being 'de-leeted' and converted back to alpha characters (i.e. 3 to e). The reason for this, even though some passwords may end up reading 'iadmin' instead of '!admin' is that this is only a basic comparison, but it seems to work well.
 
