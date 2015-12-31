@@ -40,6 +40,13 @@ issue_old = None
 
 rows, columns = os.popen('stty size', 'r').read().split()
 
+banner =          "\n  #####  #    # #####  #      #   #  ####  ###### ##### \n"  
+banner = banner + "  #    # #    # #    # #       # #  #      #      #    # \n"  
+banner = banner + "  #    # #    # #    # #        #    ####  #####  #    # \n"  
+banner = banner + "  #####  # ## # #    # #        #        # #      #####  \n"  
+banner = banner + "  #      ##  ## #    # #        #   #    # #      #   #  \n"  
+banner = banner + "  #      #    # #####  ######   #    ####  ###### #    # \n"  
+
 
 # Input function
 def import_file_to_list(path):
@@ -244,7 +251,8 @@ def list_duplicates(seq):
 # Run main stuff
 if __name__ == "__main__":
 
-
+    print (banner)
+    
     if int(columns) < 110:
         sys.exit("Warning: Resize your terminal to be at least 110 columns wide. Currently it is " + columns + " columns wide.")
 
