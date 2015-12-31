@@ -64,7 +64,11 @@ def output_pass(username,password,issue):
     else:
         # Username:Pass
         print (username.ljust(30),end=":".ljust(5),flush=True)
-        print (password.ljust(35),end=":".ljust(5),flush=True)
+        if issue == "":
+            end_delim = ""
+        else:
+            end_delim = ":"
+        print (password.ljust(35),end=end_delim.ljust(5),flush=True)
         print (issue)
 
 # Check for inputted min length
