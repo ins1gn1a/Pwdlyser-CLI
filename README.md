@@ -4,10 +4,10 @@ Python-based CLI Password Analyser (Reporting Tool)
 # Usage
 
 ```
-./pwdlyser.py -h
 usage: pwdlyser.py [-h] -p PASS_LIST [-a ADMIN_LIST] [-o ORG_NAME]
                    [-l MIN_LENGTH] [-A] [-s BASIC_SEARCH] [-oR] [-c]
-                   [-f FREQ_ANAL]
+                   [-f FREQ_ANAL] [--exact EXACT_SEARCH] [-u USER_SEARCH]
+                   [--admin ADMIN_PATH]
 
 Password Analyser
 
@@ -36,5 +36,9 @@ optional arguments:
   -c, --common          Check against list of common passwords
   -f FREQ_ANAL, --freq FREQ_ANAL
                         Perform frequency analysis
-
+  --exact EXACT_SEARCH  Perform a search using the exact string.
+  -u USER_SEARCH, --user USER_SEARCH
+                        Return usernames that match string (case insensitive)
+  --admin ADMIN_PATH    Import line separated list of Admin usernames to check
+                        password list
 ```
