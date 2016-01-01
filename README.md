@@ -151,3 +151,24 @@ password1                     :    3
 blu3c0at!                     :    1                                       
 Friday924                     :    1                                       
 ```
+### Report Format (-oR)
+```
+> ./pwdlyser.py -p /mnt/hgfs/shared/user -c -oR
+
+  #####  #    # #####  #      #   #  ####  ###### ##### 
+  #    # #    # #    # #       # #  #      #      #    # 
+  #    # #    # #    # #        #    ####  #####  #    # 
+  #####  # ## # #    # #        #        # #      #####  
+  #      ##  ## #    # #        #   #    # #      #   #  
+  #      #    # #####  ######   #    ####  ###### #    # 
+
+  ---- Password analysis & reporting tool -- v1.0.0 ----
+
+
+The following user accounts were found to have a password that was a variation of the most common user passwords, which can include 'password', 'letmein', '123456', 'admin', 'iloveyou', 'friday', or 'qwerty':
+- user2
+- user5
+- user1
+- user9
+- user10
+```
