@@ -66,3 +66,68 @@ optional arguments:
   --admin ADMIN_PATH    Import line separated list of Admin usernames to check
                         password list
 ```
+
+## Example Outputs
+
+### Basic Search
+```
+> ./pwdlyser.py -p /mnt/hgfs/shared/user -s pass
+
+  #####  #    # #####  #      #   #  ####  ###### ##### 
+  #    # #    # #    # #       # #  #      #      #    # 
+  #    # #    # #    # #        #    ####  #####  #    # 
+  #####  # ## # #    # #        #        # #      #####  
+  #      ##  ## #    # #        #   #    # #      #   #  
+  #      #    # #####  ######   #    ####  ###### #    # 
+
+  ---- Password analysis & reporting tool -- v1.0.0 ----
+
+------------------------------:    ------------------------------     :    ------------------------------
+Username                      :    Password                           :    Description
+------------------------------:    ------------------------------     :    ------------------------------
+user1                         :    password1                          :    Variation of pass
+                              :    testpass                           :    Variation of pass
+```
+
+### User As Pass
+
+```
+> ./pwdlyser.py -p /mnt/hgfs/shared/user -up
+
+  #####  #    # #####  #      #   #  ####  ###### ##### 
+  #    # #    # #    # #       # #  #      #      #    # 
+  #    # #    # #    # #        #    ####  #####  #    # 
+  #####  # ## # #    # #        #        # #      #####  
+  #      ##  ## #    # #        #   #    # #      #   #  
+  #      #    # #####  ######   #    ####  ###### #    # 
+
+  ---- Password analysis & reporting tool -- v1.0.0 ----
+
+------------------------------:    ------------------------------     :    ------------------------------
+Username                      :    Password                           :    Description
+------------------------------:    ------------------------------     :    ------------------------------
+lenovo                        :    L3n0vo!                            :    Variation of surecloud
+bluecoat                      :    *blu3c0at$                          :    Variation of bluecoat
+
+```
+
+### Common Passwords
+
+```
+> ./pwdlyser.py -p /mnt/hgfs/shared/user -c
+
+  #####  #    # #####  #      #   #  ####  ###### ##### 
+  #    # #    # #    # #       # #  #      #      #    # 
+  #    # #    # #    # #        #    ####  #####  #    # 
+  #####  # ## # #    # #        #        # #      #####  
+  #      ##  ## #    # #        #   #    # #      #   #  
+  #      #    # #####  ######   #    ####  ###### #    # 
+
+  ---- Password analysis & reporting tool -- v1.0.0 ----
+
+------------------------------:    ------------------------------     :    ------------------------------
+Username                      :    Password                           :    Description
+------------------------------:    ------------------------------     :    ------------------------------
+user1                         :    password1                          :    Variation of password
+user4                         :    l3tme1n_*                          |    Variation of letmein
+```
