@@ -165,7 +165,9 @@ Friday924                     :    1
   ---- Password analysis & reporting tool -- v1.0.0 ----
 
 
-The following user accounts were found to have a password that was a variation of the most common user passwords, which can include 'password', 'letmein', '123456', 'admin', 'iloveyou', 'friday', or 'qwerty':
+The following user accounts were found to have a password that was a variation 
+of the most common user passwords, which can include 'password', 'letmein', 
+'123456', 'admin', 'iloveyou', 'friday', or 'qwerty':
 - user2
 - user5
 - user1
