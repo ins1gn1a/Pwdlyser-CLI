@@ -131,3 +131,23 @@ Username                      :    Password                           :    Descr
 user1                         :    password1                          :    Variation of password
 user4                         :    l3tme1n_*                          :    Variation of letmein
 ```
+### Frequency
+```
+> ./pwdlyser.py -p /mnt/hgfs/shared/user -f 3
+
+  #####  #    # #####  #      #   #  ####  ###### ##### 
+  #    # #    # #    # #       # #  #      #      #    # 
+  #    # #    # #    # #        #    ####  #####  #    # 
+  #####  # ## # #    # #        #        # #      #####  
+  #      ##  ## #    # #        #   #    # #      #   #  
+  #      #    # #####  ######   #    ####  ###### #    # 
+
+  ---- Password analysis & reporting tool -- v1.0.0 ----
+
+------------------------------:    ------------------------------          
+Password                      :    Frequency                               
+------------------------------:    ------------------------------          
+password1                     :    3                                       
+blu3c0at!                     :    1                                       
+Friday924                     :    1                                       
+```
