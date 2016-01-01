@@ -107,7 +107,7 @@ user1                         :    password1                          :    Varia
 Username                      :    Password                           :    Description
 ------------------------------:    ------------------------------     :    ------------------------------
 lenovo                        :    L3n0vo!                            :    Variation of surecloud
-bluecoat                      :    *blu3c0at$                          :    Variation of bluecoat
+bluecoat                      :    *blu3c0at$                         :    Variation of bluecoat
 
 ```
 
@@ -129,5 +129,5 @@ bluecoat                      :    *blu3c0at$                          :    Vari
 Username                      :    Password                           :    Description
 ------------------------------:    ------------------------------     :    ------------------------------
 user1                         :    password1                          :    Variation of password
-user4                         :    l3tme1n_*                          |    Variation of letmein
+user4                         :    l3tme1n_*                          :    Variation of letmein
 ```
