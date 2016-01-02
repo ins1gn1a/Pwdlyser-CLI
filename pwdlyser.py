@@ -315,7 +315,7 @@ if __name__ == "__main__":
     admin_count = 0
     pass_count = 0
 
-    if args.freq_anal is None and args.output_report is False:
+    if args.freq_anal is None and args.freq_len is None and args.output_report is False:
      
         # Headers
         output_pass("-" * 30,"-" * 30,"-" * 30)
@@ -333,7 +333,7 @@ if __name__ == "__main__":
         
             check_frequency_analysis(full_list,args.freq_anal)
 
-    if args.freq_len is not None:
+    elif args.freq_len is not None:
         if args.output_report:
             print ("The following is a descending list of the most popular password lengths: ")
             check_frequency_length(full_list,args.freq_len)
@@ -441,3 +441,6 @@ if __name__ == "__main__":
 # Not working at the moment :(
 #    if args.shared_pass:
 #        check_shared_pass(full_list)
+ 
+
+
