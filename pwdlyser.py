@@ -28,6 +28,7 @@ parser.add_argument('-u','--user',dest='user_search',help='Return usernames that
 parser.add_argument('--admin',dest='admin_path',help='Import line separated list of Admin usernames to check password list',required=False)
 parser.add_argument('-up','--user-as-pass',dest='user_as_pass',help='Check for passwords that use part of the username',required=False,action='store_true',default=False)
 #parser.add_argument('--shared',dest='shared_pass',help='Display any reused/shared passwords.',required=False,action='store_true',default=False)
+parser.add_argument('-fl','--freq-length',dest='freq_len',help='Perform frequency analysis',required=False,type=int)
 args = parser.parse_args()
 
 pass_list = args.pass_list
@@ -78,8 +79,8 @@ def output_pass(username,password,issue):
     else:
         end_delim = ":"
 
-    print (username.ljust(30),end=end.ljust(5),flush=True)
-    print (password.ljust(35),end=end_delim.ljust(5),flush=True)
+    print (str(username.ljust(30)),end=end.ljust(5),flush=True)
+    print (str(password.ljust(35)),end=end_delim.ljust(5),flush=True)
     print (issue)
 
 def print_report(u):
@@ -227,6 +228,28 @@ def check_frequency_analysis(full_list,length):
             output_pass(pair[0],str(pair[1]),"")
             z += 1
 
+# Perform frequency analysis for [num]
+def check_frequency_length(full_list,length):
+    z = 0
+    pwd_list = []
+    words = Counter()
+
+    for pwd in full_list:
+        x = pwd[1]
+        pwd_list.append(len(x))
+
+    words.update(pwd_list)
+    wordfreq = (words.most_common())
+
+    for pair in wordfreq:
+        if z < length and args.output_report:
+            print_report(str(pair[0]))
+            z += 1
+        elif z < length and args.output_report is False:
+            output_pass(str(pair[0]),str(pair[1]),"")
+            z += 1
+
+
 ''' 
 #def check_shared_pass(full_list):
 #    z = 0
@@ -309,6 +332,17 @@ if __name__ == "__main__":
             output_pass("-" * 30,"-" * 30,"")
         
             check_frequency_analysis(full_list,args.freq_anal)
+
+    if args.freq_len is not None:
+        if args.output_report:
+            print ("The following is a descending list of the most popular password lengths: ")
+            check_frequency_length(full_list,args.freq_len)
+        else:
+            output_pass("-" * 30,"-" * 30,"")
+            output_pass("Password","Frequency","")
+            output_pass("-" * 30,"-" * 30,"")
+            check_frequency_length(full_list,args.freq_len)
+
     
     else:
         # Print everything and exit
@@ -407,6 +441,3 @@ if __name__ == "__main__":
 # Not working at the moment :(
 #    if args.shared_pass:
 #        check_shared_pass(full_list)
- 
-
-
