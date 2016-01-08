@@ -15,7 +15,6 @@ from collections import defaultdict
 
 parser = argparse.ArgumentParser(description='Password Analyser')
 parser.add_argument('-p','--pass-list',dest='pass_list',help='Enter the path to the list of passwords, either in the format of passwords, or username:password.',required=True)
-parser.add_argument('-a','--admin-list',dest='admin_list',help='Enter the path to the list of admin accounts that will be highlighted if they are seen within the password list',required=False)
 parser.add_argument('-o','--org-name',dest='org_name',help='Enter the organisation name to identify any users that will be using a variation of the word for their password. Note: False Positives are possible',required=False)
 parser.add_argument('-l','--length',dest='min_length',help='Display passwords that do not meet the minimum length',type=int,required=False)
 parser.add_argument('-A','--all',dest='print_all',help='Print only usernames',action='store_true',required=False)
@@ -32,7 +31,7 @@ parser.add_argument('-fl','--freq-length',dest='freq_len',help='Perform frequenc
 args = parser.parse_args()
 
 pass_list = args.pass_list
-admin_list = args.admin_list
+admin_list = args.admin_path
 organisation = args.org_name
 issue_old = None
 
