@@ -135,7 +135,7 @@ def reverse_leet_speak():
     return leet_list
     
 def check_user_as_pass(user,pwd):
-    if user == NONE or user == "":
+    if user == "NONE" or user == "":
         return
     check_basic_search(user,pwd,user)
 
