@@ -199,12 +199,11 @@ def delimit_list(list):
     list = import_file_to_list(list)
     out_list = []
     for list_entry in list:
-        out_list.append(list_entry.split(":"))
-    try:
-        sorted_list = sorted(out_list, key=lambda x: x[1])
-    except:
-        sys.exit("ERROR: Cannot delimit list. Ensure format is Username:Password.")
-    return (sorted_list)
+        list_stuff = list_entry.split(":")
+        if (len(list_stuff)) == 1:
+            list_stuff.append("")
+        out_list.append(list_stuff)
+    return (out_list)
 
 # Perform frequency analysis for [num]
 def check_frequency_analysis(full_list,length):
