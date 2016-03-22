@@ -60,9 +60,14 @@ def import_file_to_list(path):
 
 def check_admin(user,pwd):
     admin_list = import_file_to_list(args.admin_path)
+    if args.output_report:
+        print ("The following Administrative user accounts were found to have weak passwords set:")
     for admin in admin_list:
         if admin.lower() in user.lower():
-            output_pass(user,pwd,"Admin: " + admin)
+            if args.output_report:
+                print_report(user)
+            else:
+                output_pass(user,pwd,"Admin: " + admin)
 
 # Output to STDOUT
 def output_pass(username,password,issue):
