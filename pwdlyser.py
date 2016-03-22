@@ -39,7 +39,7 @@ rows, columns = os.popen('stty size', 'r').read().split()
 
 v_1 = "1"
 v_2 = "0"
-v_3 = "2"
+v_3 = "3"
 
 version = v_1 + "." + v_2 + "." + v_3
 
@@ -59,9 +59,8 @@ def import_file_to_list(path):
     return out_var
 
 def check_admin(user,pwd):
+
     admin_list = import_file_to_list(args.admin_path)
-    if args.output_report:
-        print ("The following Administrative user accounts were found to have weak passwords set:")
     for admin in admin_list:
         if admin.lower() in user.lower():
             if args.output_report:
