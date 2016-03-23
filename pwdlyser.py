@@ -39,7 +39,7 @@ rows, columns = os.popen('stty size', 'r').read().split()
 
 v_1 = "1"
 v_2 = "0"
-v_3 = "3"
+v_3 = "4"
 
 version = v_1 + "." + v_2 + "." + v_3
 
@@ -62,7 +62,7 @@ def check_admin(user,pwd):
 
     admin_list = import_file_to_list(args.admin_path)
     for admin in admin_list:
-        if admin.lower() in user.lower():
+        if admin.lower() == user.lower():
             if args.output_report:
                 print_report(user)
             else:
