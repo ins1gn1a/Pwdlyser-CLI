@@ -416,7 +416,10 @@ if __name__ == "__main__":
 
         # Check for username (basic search)
         if args.user_search is not None:
-            check_user_search(user,pwd,args.user_search)
+            for item in full_list:
+                user = item[0]
+                pwd = item[1]
+                check_user_search(user,pwd,args.user_search)
 
         # Check if admins have had their passwords cracked
         if args.admin_path is not None:
