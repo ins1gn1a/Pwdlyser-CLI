@@ -17,7 +17,7 @@ parser = argparse.ArgumentParser(description='Password Analyser')
 parser.add_argument('-p','--pass-list',dest='pass_list',help='Enter the path to the list of passwords, either in the format of passwords, or username:password.',required=True)
 parser.add_argument('-o','--org-name',dest='org_name',help='Enter the organisation name to identify any users that will be using a variation of the word for their password. Note: False Positives are possible',required=False)
 parser.add_argument('-l','--length',dest='min_length',help='Display passwords that do not meet the minimum length',type=int,required=False)
-#parser.add_argument('-A','--all',dest='print_all',help='Print only usernames',action='store_true',required=False)
+parser.add_argument('-A','--all',dest='print_all',help='Print only usernames',action='store_true',required=False)
 parser.add_argument('-s','--search',dest='basic_search',help='Run a basic search using a keyword. Non-alpha characters will be stripped, i.e. syst3m will become systm (although this will be compared against the same stripped passwords',required=False)
 parser.add_argument('-oR',dest='output_report',help='Output format set for reporting with "- " prefix',action='store_true',default=False,required=False)
 parser.add_argument('-c','--common',dest='common_pass',help='Check against list of common passwords',action='store_true',default=False,required=False)
@@ -40,7 +40,7 @@ rows, columns = os.popen('stty size', 'r').read().split()
 
 v_1 = "1"
 v_2 = "1"
-v_3 = "0"
+v_3 = "1"
 
 version = v_1 + "." + v_2 + "." + v_3
 
@@ -366,7 +366,7 @@ def check_character_analysis(full_list):
 
     for pair in wordfreq:
         if w != 20:
-            percent = str((pair[1] / mostUsed) * 10).split('.')[0]
+            percent = str((pair[1] / mostUsed) * 50).split('.')[0]
             if args.output_report:
                 print_report(str((pair[0]) + "  :  " + str(ast * int(percent)) + str((10 - int(percent)) * " ") + "| "))
             else:
@@ -402,7 +402,7 @@ if __name__ == "__main__":
                 output_pass("Character","Count","")
                 output_pass("-" * 30,"-" * 30,"")
 
-            else:
+            elif (args.print_all is False):
                 # Headers
                 output_pass("-" * 30,"-" * 30,"-" * 30)
                 output_pass("Username","Password","Description")
@@ -434,9 +434,38 @@ if __name__ == "__main__":
 
     else:
         # Print everything and exit
-#        if args.print_all:
-#            output_pass(user,pwd,"Not Analysed")
-#            sys.exit() # Skip analysis functions below
+        if args.print_all:
+            args.output_report = True
+
+            check_character_analysis(full_list)
+
+            print ("The following is a descending list of the most popular password lengths: ")
+            check_frequency_length(full_list,10)
+            print ("")
+
+            print ("The following passwords were the 10 most commonly used passwords that were able to be obtained:")
+            check_frequency_analysis(full_list,10)
+
+            print ("\nThe length of the following user account passwords does not meet the recommended minimum of 9 characters:")
+            min_count = 9
+
+
+            for item in full_list:
+                user = item[0]
+                pwd = item[1]
+                if pwd == "":
+                    pwd = "*******BLANK-PASS*******"
+                check_min_length(pwd,min_count)
+
+            print ("\nThe following user accounts used a variation of the username as the password.")
+            for item in full_list:
+                user = item[0]
+                pwd = item[1]
+                if pwd == "":
+                    pwd = "*******BLANK-PASS*******"
+                check_user_as_pass(user,pwd)
+
+            sys.exit() # Skip analysis functions below
 
         # Check for passwords that don't meet Min Length
         if (args.min_length is not None):
@@ -533,6 +562,3 @@ if __name__ == "__main__":
 # Not working at the moment :(
 #    if args.shared_pass:
 #        check_shared_pass(full_list)
-
-
-
