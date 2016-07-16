@@ -28,10 +28,10 @@ To just identify the top [num] of passwords, i.e. frequency analysis, use the ``
 Other options can be seen within the ```-h``` menu or below:
 
 ```
-usage: pwdlyser.py [-h] -p PASS_LIST [-a ADMIN_LIST] [-o ORG_NAME]
-                   [-l MIN_LENGTH] [-A] [-s BASIC_SEARCH] [-oR] [-c]
-                   [-f FREQ_ANAL] [--exact EXACT_SEARCH] [-u USER_SEARCH]
-                   [--admin ADMIN_PATH]
+usage: pwdlyser.py [-h] -p PASS_LIST [-o ORG_NAME] [-l MIN_LENGTH] [-A]
+                   [-s BASIC_SEARCH] [-oR] [-c] [-f FREQ_ANAL]
+                   [--exact EXACT_SEARCH] [-u USER_SEARCH]
+                   [--admin ADMIN_PATH] [-up] [-fl FREQ_LEN] [--char-analysis]
 
 Password Analyser
 
@@ -40,10 +40,6 @@ optional arguments:
   -p PASS_LIST, --pass-list PASS_LIST
                         Enter the path to the list of passwords, either in the
                         format of passwords, or username:password.
-  -a ADMIN_LIST, --admin-list ADMIN_LIST
-                        Enter the path to the list of admin accounts that will
-                        be highlighted if they are seen within the password
-                        list
   -o ORG_NAME, --org-name ORG_NAME
                         Enter the organisation name to identify any users that
                         will be using a variation of the word for their
@@ -65,6 +61,10 @@ optional arguments:
                         Return usernames that match string (case insensitive)
   --admin ADMIN_PATH    Import line separated list of Admin usernames to check
                         password list
+  -up, --user-as-pass   Check for passwords that use part of the username
+  -fl FREQ_LEN, --freq-length FREQ_LEN
+                        Perform frequency analysis
+  --char-analysis       Perform character-level analysis
 ```
 
 ## Example Outputs
@@ -106,9 +106,9 @@ user1                         :    password1                          :    Varia
 ------------------------------:    ------------------------------     :    ------------------------------
 Username                      :    Password                           :    Description
 ------------------------------:    ------------------------------     :    ------------------------------
-lenovo                        :    L3n0vo!                            :    Variation of surecloud
-bluecoat                      :    *blu3c0at$                         :    Variation of bluecoat
-
+lenovo                        :    L3n0vo!                            :    Variation of lenovo
+Bluecoat                      :    *blu3c0at$                         :    Variation of Bluecoat
+system                        :    sy$t3m!                            :    Variation of system
 ```
 
 ### Common Passwords
