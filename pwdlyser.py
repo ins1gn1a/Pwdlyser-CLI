@@ -1,6 +1,6 @@
 #! /usr/bin/env python3
 
-''' 
+'''
 To Do:
 * Identify multiple shared passwords.
 * Keyboard patterns: e.g. zxcdsa, asdfjkl;
@@ -17,7 +17,7 @@ parser = argparse.ArgumentParser(description='Password Analyser')
 parser.add_argument('-p','--pass-list',dest='pass_list',help='Enter the path to the list of passwords, either in the format of passwords, or username:password.',required=True)
 parser.add_argument('-o','--org-name',dest='org_name',help='Enter the organisation name to identify any users that will be using a variation of the word for their password. Note: False Positives are possible',required=False)
 parser.add_argument('-l','--length',dest='min_length',help='Display passwords that do not meet the minimum length',type=int,required=False)
-parser.add_argument('-A','--all',dest='print_all',help='Print only usernames',action='store_true',required=False)
+#parser.add_argument('-A','--all',dest='print_all',help='Print only usernames',action='store_true',required=False)
 parser.add_argument('-s','--search',dest='basic_search',help='Run a basic search using a keyword. Non-alpha characters will be stripped, i.e. syst3m will become systm (although this will be compared against the same stripped passwords',required=False)
 parser.add_argument('-oR',dest='output_report',help='Output format set for reporting with "- " prefix',action='store_true',default=False,required=False)
 parser.add_argument('-c','--common',dest='common_pass',help='Check against list of common passwords',action='store_true',default=False,required=False)
@@ -28,6 +28,7 @@ parser.add_argument('--admin',dest='admin_path',help='Import line separated list
 parser.add_argument('-up','--user-as-pass',dest='user_as_pass',help='Check for passwords that use part of the username',required=False,action='store_true',default=False)
 #parser.add_argument('--shared',dest='shared_pass',help='Display any reused/shared passwords.',required=False,action='store_true',default=False)
 parser.add_argument('-fl','--freq-length',dest='freq_len',help='Perform frequency analysis',required=False,type=int)
+parser.add_argument('--char-analysis',dest='char_anal',help='Perform character-level analysis',required=False,action='store_true',default=False)
 args = parser.parse_args()
 
 pass_list = args.pass_list
@@ -38,17 +39,17 @@ issue_old = None
 rows, columns = os.popen('stty size', 'r').read().split()
 
 v_1 = "1"
-v_2 = "0"
-v_3 = "4"
+v_2 = "1"
+v_3 = "0"
 
 version = v_1 + "." + v_2 + "." + v_3
 
-banner =        "\n  #####  #     # #####  #      #   #  ####  ###### ##### \n"  
-banner = banner + "  #    # #     # #    # #       # #  #      #      #    # \n"  
-banner = banner + "  #    # #  #  # #    # #        #    ####  #####  #    # \n"  
-banner = banner + "  #####  # # # # #    # #        #        # #      #####  \n"  
-banner = banner + "  #      ##   ## #    # #        #   #    # #      #   #  \n"  
-banner = banner + "  #      #     # #####  ######   #    ####  ###### #    # \n\n"  
+banner =        "\n  #####  #     # #####  #      #   #  ####  ###### ##### \n"
+banner = banner + "  #    # #     # #    # #       # #  #      #      #    # \n"
+banner = banner + "  #    # #  #  # #    # #        #    ####  #####  #    # \n"
+banner = banner + "  #####  # # # # #    # #        #        # #      #####  \n"
+banner = banner + "  #      ##   ## #    # #        #   #    # #      #   #  \n"
+banner = banner + "  #      #     # #####  ######   #    ####  ###### #    # \n\n"
 banner = banner + "  ---- Password analysis & reporting tool --- v" + version + " ----\n"
 
 
@@ -76,7 +77,7 @@ def output_pass(username,password,issue):
         end = ""
     else:
         end = ":"
-        
+
     if issue == "":
         end_delim = ""
     else:
@@ -137,7 +138,7 @@ def reverse_leet_speak():
     with open("pwd_leet.conf") as leetconf:
         leet_list = leetconf.read().splitlines()
     return leet_list
-    
+
 def check_user_as_pass(user,pwd):
     if user == "NONE" or user == "":
         return
@@ -183,7 +184,7 @@ def check_common_pass(user,password):
         for line in leet_list:
             char_change = line.split(",")
 
-            # Amend each 
+            # Amend each
             try:
                 if char_change[0] in password:
                      pwd_unleet = (pwd_unleet.replace(char_change[0],char_change[1])).lower()
@@ -203,7 +204,7 @@ def delimit_list(list):
     list = import_file_to_list(list)
     out_list = []
     for list_entry in list:
-        list_stuff = list_entry.split(":")
+        list_stuff = list_entry.split(":",1)
         if (len(list_stuff)) == 1:
             list_stuff.append("")
         out_list.append(list_stuff)
@@ -254,7 +255,7 @@ def check_frequency_length(full_list,length):
             z += 1
 
 
-''' 
+'''
 #def check_shared_pass(full_list):
 #    z = 0
 #    pwd_list = []
@@ -281,7 +282,7 @@ def list_duplicates(seq):
     tally = defaultdict(list)
     for i,item in enumerate(seq):
         tally[item].append(i)
-    return ((key,locs) for key,locs in tally.items() 
+    return ((key,locs) for key,locs in tally.items()
                             if len(locs)>1)
 
 #    print (comp_list)
@@ -296,14 +297,88 @@ def list_duplicates(seq):
 
 #    for l in uniq:
 #        output_pass(l[0],str(l[1]),"")
-   
+
 '''
- 
+
+# Run character analysis
+
+# Perform analysis analysis
+def check_character_analysis(full_list):
+    z = 0
+    pwd_list = []
+    words = Counter()
+    upperList = []
+    lowerList = []
+    numList = []
+    specList = []
+    allList = []
+
+    for pwd in full_list:
+        z += 1
+        x = pwd[1]
+        pwd_list.append(x)
+
+    alphaCharList = ['a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z']
+    numCharList = ['0','1','2','3','4','5','6','7','8','9']
+    specCharList = ['!','@','£','#','$','%','^','&','*','(',')','-','+','=','_','|','?','`','±','§',';',':']
+
+
+    # At present I only report on top characters, but the *List dicts provide support for single charset type.
+    for e in pwd_list:
+        charLen = len(e)
+
+        for char in alphaCharList:
+            count = 0
+            for i in range(charLen):
+                if char.upper() == e[count]:
+                    upperList.append(e[count])
+                    allList.append(e[count])
+                elif char.lower() == e[count]:
+                    lowerList.append(e[count])
+                    allList.append(e[count])
+                count += 1
+
+        for char in numCharList:
+            count = 0
+            for i in range(charLen):
+                if char == e[count]:
+                    allList.append(e[count])
+                    numList.append(e[count])
+                count += 1
+
+        for char in specCharList:
+            count = 0
+            for i in range(charLen):
+                if char == e[count]:
+                    specList.append(e[count])
+                    allList.append(e[count])
+                count += 1
+
+    words.update(allList)
+    wordfreq = (words.most_common())
+
+    w = 0
+    ast = "*"
+    mostUsed = (wordfreq[0])[1]
+
+    if args.output_report:
+        print ("The top 20 characters used out of " + str(z) + " passowrds:")
+
+    for pair in wordfreq:
+        if w != 20:
+            percent = str((pair[1] / mostUsed) * 10).split('.')[0]
+            if args.output_report:
+                print_report(str((pair[0]) + "  :  " + str(ast * int(percent)) + str((10 - int(percent)) * " ") + "| "))
+            else:
+                output_pass(str(pair[0]),str(pair[1]),"")
+            w += 1
+    print ("")
+
 # Run main stuff
 if __name__ == "__main__":
 
     print (banner)
-    
+
     if int(columns) < 110:
         sys.exit("Warning: Resize your terminal to be at least 110 columns wide. Currently it is " + columns + " columns wide.")
 
@@ -319,12 +394,19 @@ if __name__ == "__main__":
     admin_count = 0
     pass_count = 0
 
-    if args.freq_anal is None and args.freq_len is None and args.output_report is False:
-     
-        # Headers
-        output_pass("-" * 30,"-" * 30,"-" * 30)
-        output_pass("Username","Password","Description")
-        output_pass("-" * 30,"-" * 30,"-" * 30)
+
+    if args.output_report is False:
+        if ((args.freq_anal is None) and (args.freq_len is None)):
+            if args.char_anal:
+                output_pass("-" * 30,"-" * 30,"")
+                output_pass("Character","Count","")
+                output_pass("-" * 30,"-" * 30,"")
+
+            else:
+                # Headers
+                output_pass("-" * 30,"-" * 30,"-" * 30)
+                output_pass("Username","Password","Description")
+                output_pass("-" * 30,"-" * 30,"-" * 30)
 
     if args.freq_anal is not None:
         if args.output_report:
@@ -334,7 +416,7 @@ if __name__ == "__main__":
             output_pass("-" * 30,"-" * 30,"")
             output_pass("Password","Frequency","")
             output_pass("-" * 30,"-" * 30,"")
-        
+
             check_frequency_analysis(full_list,args.freq_anal)
 
     elif args.freq_len is not None:
@@ -343,16 +425,18 @@ if __name__ == "__main__":
             check_frequency_length(full_list,args.freq_len)
         else:
             output_pass("-" * 30,"-" * 30,"")
-            output_pass("Password","Frequency","")
+            output_pass("Password Length","Frequency","")
             output_pass("-" * 30,"-" * 30,"")
             check_frequency_length(full_list,args.freq_len)
 
-    
+    elif args.char_anal:
+        check_character_analysis(full_list)
+
     else:
         # Print everything and exit
-        if args.print_all:
-            output_pass(user,pwd,"Not Analysed")
-            sys.exit() # Skip analysis functions below
+#        if args.print_all:
+#            output_pass(user,pwd,"Not Analysed")
+#            sys.exit() # Skip analysis functions below
 
         # Check for passwords that don't meet Min Length
         if (args.min_length is not None):
@@ -378,7 +462,7 @@ if __name__ == "__main__":
                     pwd = "*******BLANK-PASS*******"
                 check_org_name(user,pwd,organisation)
 
-        # Check for passwords via unleeted search             
+        # Check for passwords via unleeted search
         if args.basic_search is not None:
             if args.output_report and search_count == 0:
                 print ("\nThe following user accounts were found to have a password that was some variation of the word/phrase: " + args.basic_search)
@@ -433,7 +517,7 @@ if __name__ == "__main__":
                     pwd = "*******BLANK-PASS*******"
                 check_admin(user,pwd)
 
-        # Check if password contains username            
+        # Check if password contains username
         if args.user_as_pass:
             if args.output_report and pass_count == 0:
                 print ("\nThe following user accounts were found to have a variation of their username set as their account password: ")
@@ -445,9 +529,10 @@ if __name__ == "__main__":
                     pwd = "*******BLANK-PASS*******"
                 check_user_as_pass(user,pwd)
 
+
 # Not working at the moment :(
 #    if args.shared_pass:
 #        check_shared_pass(full_list)
- 
+
 
 
