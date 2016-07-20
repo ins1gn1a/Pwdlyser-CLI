@@ -40,7 +40,7 @@ rows, columns = os.popen('stty size', 'r').read().split()
 
 v_1 = "1"
 v_2 = "1"
-v_3 = "1"
+v_3 = "2"
 
 version = v_1 + "." + v_2 + "." + v_3
 
@@ -63,9 +63,10 @@ def check_admin(user,pwd):
 
     admin_list = import_file_to_list(args.admin_path)
     for admin in admin_list:
-        if admin.lower() == user.lower():
+        #print (admin.lower().rstrip() ==  user.lower().rstrip())
+        if admin.lower().rstrip() == user.lower().rstrip():
             if args.output_report:
-                print_report(user)
+                print_report(user) #  + " [Variation of '" +  + "']")
             else:
                 output_pass(user,pwd,"Admin: " + admin)
 
@@ -73,12 +74,12 @@ def check_admin(user,pwd):
 def output_pass(username,password,issue):
 
 
-    if password == "":
+    if password.rstrip() == "":
         end = ""
     else:
         end = ":"
 
-    if issue == "":
+    if issue.rstrip() == "":
         end_delim = ""
     else:
         end_delim = ":"
@@ -92,7 +93,7 @@ def print_report(u):
 
 # Check for inputted min length
 def check_min_length(password,min):
-    if (len(password) < min) or (password == "*******BLANK-PASS*******"):
+    if (len(password) < min) or (password.rstrip() == "*******BLANK-PASS*******"):
         if args.output_report:
             print_report(user)
         else:
@@ -140,7 +141,7 @@ def reverse_leet_speak():
     return leet_list
 
 def check_user_as_pass(user,pwd):
-    if user == "NONE" or user == "":
+    if user.rstrip() == "NONE" or user.rstrip() == "":
         return
     check_basic_search(user,pwd,user)
 
@@ -191,7 +192,7 @@ def check_common_pass(user,password):
             except:
                 continue
 
-        if (common in pwd_unleet) and (x == 0):
+        if (common in pwd_unleet) and (x.rstrip() == 0):
             if args.output_report:
                 print_report(user)
             else:
@@ -263,7 +264,7 @@ def check_frequency_length(full_list,length):
 
     for pwd in full_list:
         x = pwd[1]
-        if x == "":
+        if x ==.rstrip() "":
             x = "*******BLANK-PASS*******"
         pwd_list.append(x)
 
@@ -482,7 +483,7 @@ if __name__ == "__main__":
         # Check if Org name (or slight variation) is in list
         if organisation is not None:
             if args.output_report and org_count == 0:
-                print ("\nThe organisation name + " + organisation + " appears within several passwords for the following accounts (within some variation):")
+                print ("\nThe organisation name " + organisation + " appears within several passwords for the following accounts (within some variation):")
                 org_count += 1
             for item in full_list:
                 user = item[0]
@@ -537,7 +538,7 @@ if __name__ == "__main__":
         # Check if admins have had their passwords cracked
         if args.admin_path is not None:
             if args.output_report and admin_count == 0:
-                print ("\nThe following user accounts were identified as Administrators of various systems and were found to have weak passwords set: ")
+                print ("\nThe following user accounts were identified as Domain Administrators (Domain Admins, Enterprise Admins, Administrators, etc) and were found to have weak passwords set: ")
                 admin_count += 1
             for item in full_list:
                 user = item[0]
