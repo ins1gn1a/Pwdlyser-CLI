@@ -40,7 +40,7 @@ rows, columns = os.popen('stty size', 'r').read().split()
 
 v_1 = "1"
 v_2 = "1"
-v_3 = "2"
+v_3 = "3"
 
 version = v_1 + "." + v_2 + "." + v_3
 
