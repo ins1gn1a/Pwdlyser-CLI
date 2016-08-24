@@ -192,7 +192,7 @@ def check_common_pass(user,password):
             except:
                 continue
 
-        if (common in pwd_unleet) and (x.rstrip() == 0):
+        if (common in pwd_unleet) and (x == 0):
             if args.output_report:
                 print_report(user)
             else:
