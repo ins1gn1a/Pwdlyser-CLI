@@ -228,7 +228,7 @@ def check_frequency_analysis(full_list,length):
 
     for pair in wordfreq:
         if z < length and args.output_report:
-            print_report(pair[0])
+            print_report(str(pair[0]) + " : " + str(int(pair[1] / int(len(wordfreq)) * 100)) + "%")
             z += 1
         elif z < length and args.output_report is False:
             output_pass(pair[0],str(pair[1]),"")
@@ -250,7 +250,7 @@ def check_frequency_length(full_list,length):
     totalpass = len(wordfreq)
     for pair in wordfreq:
         if z < length and args.output_report:
-            print_report(str(pair[0]) + " : " + str(int((pair[1] / totalpass) * 100)) + "%")
+            print_report("Length : " + str(pair[0]) + " : " + str(int((pair[1] / totalpass) * 100)) + "%")
             z += 1
         elif z < length and args.output_report is False:
             output_pass(str(pair[0]),str(pair[1]),"")
@@ -370,7 +370,7 @@ def check_character_analysis(full_list):
         if w != 20:
             percent = str((pair[1] / mostUsed) * 50).split('.')[0]
             if args.output_report:
-                print_report(str((pair[0]) + "  :  " + str(ast * int(percent)) + str((10 - int(percent)) * " ") + "| "))
+                print_report(str((pair[0]) + "  :  " + str(ast * int(percent)) + str((10 - int(percent)) * " ") + "| " + str(pair[1])))
             else:
                 output_pass(str(pair[0]),str(pair[1]),"")
             w += 1
