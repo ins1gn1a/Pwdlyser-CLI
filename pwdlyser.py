@@ -250,7 +250,7 @@ def check_frequency_length(full_list,length):
     totalpass = len(wordfreq)
     for pair in wordfreq:
         if z < length and args.output_report:
-            print_report("Length : " + str(pair[0]) + " : " + str(int((pair[1] / totalpass) * 100)) + "%")
+            print_report(str(pair[0]) + " : " + str(int((pair[1] / totalpass) * 100)) + "%")
             z += 1
         elif z < length and args.output_report is False:
             output_pass(str(pair[0]),str(pair[1]),"")
