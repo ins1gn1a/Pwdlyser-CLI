@@ -433,6 +433,8 @@ if __name__ == "__main__":
 
     elif args.char_anal:
         check_character_analysis(full_list)
+        
+    
 
     else:
         # Print everything and exit
@@ -466,6 +468,18 @@ if __name__ == "__main__":
                 if pwd == "":
                     pwd = "*******BLANK-PASS*******"
                 check_user_as_pass(user,pwd)
+                
+            if args.admin_path is not None:
+                if args.output_report and admin_count == 0:
+                    print ("\nThe following user accounts were identified as Domain Administrators (Domain Admins, Enterprise Admins, Administrators, etc) and were found to have weak passwords set: ")
+                    admin_count += 1
+                for item in full_list:
+                    user = item[0]
+                    pwd = item[1]
+                    if pwd == "":
+                        pwd = "*******BLANK-PASS*******"
+                    check_admin(user,pwd)
+
 
             sys.exit() # Skip analysis functions below
 
