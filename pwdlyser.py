@@ -40,7 +40,7 @@ rows, columns = os.popen('stty size', 'r').read().split()
 
 v_1 = "1"
 v_2 = "2"
-v_3 = "0"
+v_3 = "1"
 
 version = v_1 + "." + v_2 + "." + v_3
 
@@ -247,15 +247,13 @@ def check_frequency_length(full_list,length):
     words.update(pwd_list)
     wordfreq = (words.most_common())
 
-    totalpass = len(wordfreq)
     for pair in wordfreq:
         if z < length and args.output_report:
-            print_report("Length : " + str(pair[0]) + " : " + str(int((pair[1] / totalpass) * 100)) + "%")
+            print_report("Length : " + str(pair[0]) + " : " + str(int((pair[1] / len(pwd_list)) * 100)) + "%")
             z += 1
         elif z < length and args.output_report is False:
             output_pass(str(pair[0]),str(pair[1]),"")
             z += 1
-
 
 '''
 #def check_shared_pass(full_list):
