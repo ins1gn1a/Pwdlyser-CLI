@@ -362,7 +362,7 @@ def check_character_analysis(full_list):
     mostUsed = (wordfreq[0])[1]
 
     if args.output_report:
-        print ("The top 20 characters used out of " + str(z) + " passowrds:")
+        print ("The top 20 characters used out of " + str(z) + " passwords:")
 
     for pair in wordfreq:
         if w != 20:
