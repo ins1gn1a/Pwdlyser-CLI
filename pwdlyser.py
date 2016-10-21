@@ -463,8 +463,8 @@ if __name__ == "__main__":
             check_frequency_length(full_list,10)
             print ("")
 
-            print ("The following passwords were the 10 most commonly used passwords that were able to be obtained:")
-            check_frequency_analysis(full_list,10)
+            print ("The following passwords were the 15 most commonly used passwords that were able to be obtained:")
+            check_frequency_analysis(full_list,15)
 
             print ("\nThe length of the following user account passwords does not meet the recommended minimum of 9 characters:")
             min_count = 9
