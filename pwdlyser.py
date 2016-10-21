@@ -29,6 +29,7 @@ parser.add_argument('-up','--user-as-pass',dest='user_as_pass',help='Check for p
 #parser.add_argument('--shared',dest='shared_pass',help='Display any reused/shared passwords.',required=False,action='store_true',default=False)
 parser.add_argument('-fl','--freq-length',dest='freq_len',help='Perform frequency analysis',required=False,type=int)
 parser.add_argument('--char-analysis',dest='char_anal',help='Perform character-level analysis',required=False,action='store_true',default=False)
+parser.add_argument('--date',dest='date_day',help='Check for common date/day passwords',required=False,action='store_true',default=False)
 args = parser.parse_args()
 
 pass_list = args.pass_list
@@ -40,7 +41,7 @@ rows, columns = os.popen('stty size', 'r').read().split()
 
 v_1 = "1"
 v_2 = "2"
-v_3 = "1"
+v_3 = "2"
 
 version = v_1 + "." + v_2 + "." + v_3
 
@@ -200,6 +201,23 @@ def check_common_pass(user,password):
                 output_pass(user,password,out_issue)
                 x += 1
 
+def check_date_day(user,password):
+    x = 0
+    out_issue = ""
+
+    date_day_list = ['january','february','march','april','may','june','july','august','september','october','november','december','monday','tuesday','wednesday','thursday','friday','saturday','sunday']
+
+    # Loop through each leet_speak change in imported list
+    for line in date_day_list:
+        if (line in password.lower()) and (x == 0):
+            if args.output_report:
+                print_report(user)
+            else:
+                out_issue = "Variation of " + common
+                output_pass(user,password,out_issue)
+                x += 1
+
+
 # output and delimit input list
 def delimit_list(list):
     list = import_file_to_list(list)
@@ -216,19 +234,21 @@ def check_frequency_analysis(full_list,length):
     z = 0
     pwd_list = []
     words = Counter()
+    total_pass_length = 0
 
     for pwd in full_list:
         x = pwd[1]
         if x == "":
             x = "*******BLANK-PASS*******"
         pwd_list.append(x)
+        total_pass_length += 1
 
     words.update(pwd_list)
     wordfreq = (words.most_common())
 
     for pair in wordfreq:
         if z < length and args.output_report:
-            print_report(str(pair[0]) + " : " + str(int(pair[1] / int(len(wordfreq)) * 100)) + "%")
+            print_report(str(pair[0]) + " : " + str(int(pair[1] / int(len(wordfreq)) * 100)) + "%" + " | " + str(pair[1]) + "/" + str(total_pass_length))
             z += 1
         elif z < length and args.output_report is False:
             output_pass(pair[0],str(pair[1]),"")
@@ -393,7 +413,7 @@ if __name__ == "__main__":
     exact_count = 0
     admin_count = 0
     pass_count = 0
-
+    date_day_count = 0
 
     if args.output_report is False:
         if ((args.freq_anal is None) and (args.freq_len is None)):
@@ -432,8 +452,6 @@ if __name__ == "__main__":
     elif args.char_anal:
         check_character_analysis(full_list)
         
-    
-
     else:
         # Print everything and exit
         if args.print_all:
@@ -528,6 +546,18 @@ if __name__ == "__main__":
                 if pwd == "":
                     pwd = "*******BLANK-PASS*******"
                 check_common_pass(user,pwd)
+
+        # Check for Date/Day Passwords
+        if args.date_day is True:
+            if args.output_report and date_day_count == 0:
+                print ("\nThe following user accounts were found to have a password that was a variation of a day or date (e.g. Monday01 or September2016):")
+                date_day_count += 1
+            for item in full_list:
+                user = item[0]
+                pwd = item[1]
+                if pwd == "":
+                    pwd = "*******BLANK-PASS*******"
+                check_date_day(user,pwd)
 
         # Search exact phrase or character
         if args.exact_search is not None:
