@@ -468,8 +468,6 @@ if __name__ == "__main__":
 
             print ("\nThe length of the following user account passwords does not meet the recommended minimum of 9 characters:")
             min_count = 9
-
-
             for item in full_list:
                 user = item[0]
                 pwd = item[1]
@@ -496,6 +494,13 @@ if __name__ == "__main__":
                         pwd = "*******BLANK-PASS*******"
                     check_admin(user,pwd)
 
+            print ("\nThe following user accounts were found to have a password that was a variation of a day or date (e.g. Monday01 or September2016):")
+            for item in full_list:
+                user = item[0]
+                pwd = item[1]
+                if pwd == "":
+                    pwd = "*******BLANK-PASS*******"
+                    check_date_day(user,pwd)
 
             sys.exit() # Skip analysis functions below
 
