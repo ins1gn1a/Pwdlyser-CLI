@@ -500,7 +500,7 @@ if __name__ == "__main__":
                 pwd = item[1]
                 if pwd == "":
                     pwd = "*******BLANK-PASS*******"
-                    check_date_day(user,pwd)
+                check_date_day(user,pwd)
 
             sys.exit() # Skip analysis functions below
 
