@@ -213,7 +213,7 @@ def check_date_day(user,password):
             if args.output_report:
                 print_report(user)
             else:
-                out_issue = "Variation of " + common
+                out_issue = "Variation of '" + line.rstrip() + "'"
                 output_pass(user,password,out_issue)
                 x += 1
 
