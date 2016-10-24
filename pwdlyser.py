@@ -40,8 +40,8 @@ issue_old = None
 rows, columns = os.popen('stty size', 'r').read().split()
 
 v_1 = "1"
-v_2 = "2"
-v_3 = "2"
+v_2 = "3"
+v_3 = "0"
 
 version = v_1 + "." + v_2 + "." + v_3
 
