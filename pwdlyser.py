@@ -1,8 +1,14 @@
 #! /usr/bin/env python3
 
+
+__author__ = "Adam Govier"
+__license__ = "GPL"
+__version__ = "1.4.1"
+__maintainer__ = "ins1gn1a"
+__status__ = "Production"
+
 '''
 To Do:
-* Identify multiple shared passwords.
 * Keyboard patterns: e.g. zxcdsa, asdfjkl;
 '''
 
@@ -40,19 +46,13 @@ issue_old = None
 
 rows, columns = os.popen('stty size', 'r').read().split()
 
-v_1 = "1"
-v_2 = "4"
-v_3 = "0"
-
-version = v_1 + "." + v_2 + "." + v_3
-
 banner =        "\n  #####  #     # #####  #      #   #  ####  ###### ##### \n"
 banner = banner + "  #    # #     # #    # #       # #  #      #      #    # \n"
 banner = banner + "  #    # #  #  # #    # #        #    ####  #####  #    # \n"
 banner = banner + "  #####  # # # # #    # #        #        # #      #####  \n"
 banner = banner + "  #      ##   ## #    # #        #   #    # #      #   #  \n"
 banner = banner + "  #      #     # #####  ######   #    ####  ###### #    # \n\n"
-banner = banner + "  ---- Password analysis & reporting tool --- v" + version + " ----\n"
+banner = banner + "  ---- Password analysis & reporting tool --- v" + __version__ + " ----\n"
 
 
 # Input function
@@ -223,8 +223,20 @@ def check_date_day(user,password):
 def delimit_list(list):
     list = import_file_to_list(list)
     out_list = []
+    n = 0
     for list_entry in list:
-        list_stuff = list_entry.split(":",1)
+        try:
+            if (len(list_entry.split(":",2)[1]) >= 24) and (n == 0):
+                n += 1
+#                print (list_entry.split(":",2))
+        except:
+            n += 1
+            
+        # Delimits with hash username:hash:password or username:password
+        if n != 0:
+            list_stuff = [list_entry.split(":",2)[0],list_entry.split(":",2)[2]]
+        else:
+            list_stuff = list_entry.split(":",1)
         if (len(list_stuff)) == 1:
             list_stuff.append("")
         out_list.append(list_stuff)
@@ -282,16 +294,30 @@ def check_shared_pass(full_list):
     for item in full_list:
         a.append(item[1])
         
+    # Sort as collection
     y=collections.Counter(a)
     pwd_list = [i for i in y if y[i]>1]
 
+    # Identifying duplicates and outputting
     for x in full_list:
         for z in pwd_list:
             if x[1] == z:
+                #if ((len(x[1]) % 2) > 0):
+                
+                # Output Masking                
+                if len(x[1]) >= 5:
+                    mask_pwd = x[1][0:2] + ((len(x[1]) - 4) * "*") + x[1][-2:]
+                elif len(x[1]) == 4:
+                    mask_pwd = x[1][0:1] + ((len(x[1]) - 2) * "*") + x[1][-1:]       
+                elif len(x[1]) == 3:
+                    mask_pwd = x[1][0:1] + ((len(x[1]) - 2) * "*") + x[1][-1:]                     
+                elif len(x[1]) == 2:
+                    mask_pwd = x[1][0:1] + ((len(x[1]) - 1) * "*")    
+                
                 if args.output_report:
-                    print_report(str((x[0])))
+                    print_report(str(x[0]) + " : " + mask_pwd)
                 else:
-                    output_pass(x[0],str(x[1]),"")
+                    output_pass(x[0],str(x[1]),"Password Re-Use")
 
     
 # Run character analysis
@@ -586,6 +612,6 @@ if __name__ == "__main__":
 # Not working at the moment :(
     if args.shared_pass:
         if args.output_report and pass_count == 0:
-            print ("\nThe following user accounts were found to have a passwords set that are re-used within other user accounts. Usually, this is a coincidence with accounts using 'standard' weak password (such as 'Password1' or 'qwerty123', however where privileged/administrative accounts are used these should be reviewed further: ")
+            print ("\nThe following user accounts were found to have a passwords set that are re-used within other user accounts (with '*' representing a masked character). Usually, this is a coincidence with accounts using 'standard' weak password (such as 'Password1' or 'qwerty123', however where privileged/administrative accounts are used these should be reviewed further: ")
             shared_count += 1
         check_shared_pass(full_list)
