@@ -12,6 +12,7 @@ from string import digits
 import re
 from collections import Counter
 from collections import defaultdict
+import collections
 
 parser = argparse.ArgumentParser(description='Password Analyser')
 parser.add_argument('-p','--pass-list',dest='pass_list',help='Enter the path to the list of passwords, either in the format of passwords, or username:password.',required=True)
@@ -26,7 +27,7 @@ parser.add_argument('--exact',dest='exact_search',help='Perform a search using t
 parser.add_argument('-u','--user',dest='user_search',help='Return usernames that match string (case insensitive)',required=False)
 parser.add_argument('--admin',dest='admin_path',help='Import line separated list of Admin usernames to check password list',required=False)
 parser.add_argument('-up','--user-as-pass',dest='user_as_pass',help='Check for passwords that use part of the username',required=False,action='store_true',default=False)
-#parser.add_argument('--shared',dest='shared_pass',help='Display any reused/shared passwords.',required=False,action='store_true',default=False)
+parser.add_argument('--shared',dest='shared_pass',help='Display any reused/shared passwords.',required=False,action='store_true',default=False)
 parser.add_argument('-fl','--freq-length',dest='freq_len',help='Perform frequency analysis',required=False,type=int)
 parser.add_argument('--char-analysis',dest='char_anal',help='Perform character-level analysis',required=False,action='store_true',default=False)
 parser.add_argument('--date',dest='date_day',help='Check for common date/day passwords',required=False,action='store_true',default=False)
@@ -40,7 +41,7 @@ issue_old = None
 rows, columns = os.popen('stty size', 'r').read().split()
 
 v_1 = "1"
-v_2 = "3"
+v_2 = "4"
 v_3 = "0"
 
 version = v_1 + "." + v_2 + "." + v_3
@@ -275,51 +276,24 @@ def check_frequency_length(full_list,length):
             output_pass(str(pair[0]),str(pair[1]),"")
             z += 1
 
-'''
-#def check_shared_pass(full_list):
-#    z = 0
-#    pwd_list = []
-#    words = Counter()
 
-    for pwd in full_list:
-        x = pwd[1]
-        if x ==.rstrip() "":
-            x = "*******BLANK-PASS*******"
-        pwd_list.append(x)
+def check_shared_pass(full_list):
+    a = ([])
+    for item in full_list:
+        a.append(item[1])
+        
+    y=collections.Counter(a)
+    pwd_list = [i for i in y if y[i]>1]
 
-    words.update(pwd_list)
-    wordfreq = (words.most_common())
+    for x in full_list:
+        for z in pwd_list:
+            if x[1] == z:
+                if args.output_report:
+                    print_report(str((x[0])))
+                else:
+                    output_pass(x[0],str(x[1]),"")
 
-    comp_list = []
-    for pair in wordfreq:
-        if z < 10:
-            comp_list.append(pair)
-            z += 1
-    for dup in sorted(list_duplicates(full_list)):
-        print (dup)
-
-def list_duplicates(seq):
-    tally = defaultdict(list)
-    for i,item in enumerate(seq):
-        tally[item].append(i)
-    return ((key,locs) for key,locs in tally.items()
-                            if len(locs)>1)
-
-#    print (comp_list)
-
-#    seen = set(full_list)
-#    uniq = []
-#    for q in comp_list:
-#        if q[1] not in seen:
-#            uniq.append(q)
-#            seen.add(q)
-
-
-#    for l in uniq:
-#        output_pass(l[0],str(l[1]),"")
-
-'''
-
+    
 # Run character analysis
 
 # Perform analysis analysis
@@ -414,6 +388,7 @@ if __name__ == "__main__":
     admin_count = 0
     pass_count = 0
     date_day_count = 0
+    shared_count = 0
 
     if args.output_report is False:
         if ((args.freq_anal is None) and (args.freq_len is None)):
@@ -609,5 +584,8 @@ if __name__ == "__main__":
 
 
 # Not working at the moment :(
-#    if args.shared_pass:
-#        check_shared_pass(full_list)
+    if args.shared_pass:
+        if args.output_report and pass_count == 0:
+            print ("\nThe following user accounts were found to have a passwords set that are re-used within other user accounts. Usually, this is a coincidence with accounts using 'standard' weak password (such as 'Password1' or 'qwerty123', however where privileged/administrative accounts are used these should be reviewed further: ")
+            shared_count += 1
+        check_shared_pass(full_list)
