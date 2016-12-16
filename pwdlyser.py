@@ -3,7 +3,7 @@
 
 __author__ = "Adam Govier"
 __license__ = "GPL"
-__version__ = "1.4.1"
+__version__ = "1.4.2"
 __maintainer__ = "ins1gn1a"
 __status__ = "Production"
 
@@ -27,14 +27,14 @@ parser.add_argument('-c','--common',dest='common_pass',help='Check against list 
 parser.add_argument('--char-analysis',dest='char_anal',help='Perform character-level analysis',required=False,action='store_true',default=False)
 parser.add_argument('--date',dest='date_day',help='Check for common date/day passwords',required=False,action='store_true',default=False)
 parser.add_argument('--exact',dest='exact_search',help='Perform a search using the exact string.',required=False)
-parser.add_argument('-f','--freq',dest='freq_anal',help='Perform frequency analysis',required=False,type=int)
-parser.add_argument('-fl','--freq-length',dest='freq_len',help='Perform frequency analysis',required=False,type=int)
+parser.add_argument('-f','--frequency',dest='freq_anal',help='Perform frequency analysis',required=False,type=int)
+parser.add_argument('-fl','--length-frequency',dest='freq_len',help='Perform frequency analysis on password length',required=False,type=int)
 parser.add_argument('-l','--length',dest='min_length',help='Display passwords that do not meet the minimum length',type=int,required=False)
 parser.add_argument('-o','--org-name',dest='org_name',help='Enter the organisation name to identify any users that will be using a variation of the word for their password. Note: False Positives are possible',required=False)
 parser.add_argument('-oR',dest='output_report',help='Output format set for reporting with "- " prefix',action='store_true',default=False,required=False)
 parser.add_argument('-p','--pass-list',dest='pass_list',help='Enter the path to the list of passwords, either in the format of passwords, or username:password.',required=True)
-parser.add_argument('-s','--search',dest='basic_search',help='Run a basic search using a keyword. Non-alpha characters will be stripped, i.e. syst3m will become systm (although this will be compared against the same stripped passwords',required=False)
-parser.add_argument('--shared',dest='shared_pass',help='Display any reused/shared passwords.',required=False,action='store_true',default=False)
+parser.add_argument('-S','--search',dest='basic_search',help='Run a basic search using a keyword. Non-alpha characters will be stripped, i.e. syst3m will become systm (although this will be compared against the same stripped passwords',required=False)
+parser.add_argument('-s','--shared',dest='shared_pass',help='Display any reused/shared passwords.',required=False,action='store_true',default=False)
 parser.add_argument('-u','--user',dest='user_search',help='Return usernames that match string (case insensitive)',required=False)
 parser.add_argument('-up','--user-as-pass',dest='user_as_pass',help='Check for passwords that use part of the username',required=False,action='store_true',default=False)
 args = parser.parse_args()
@@ -62,20 +62,16 @@ def import_file_to_list(path):
     return out_var
 
 def check_admin(user,pwd):
-
     admin_list = import_file_to_list(args.admin_path)
     for admin in admin_list:
-        #print (admin.lower().rstrip() ==  user.lower().rstrip())
         if admin.lower().rstrip() == user.lower().rstrip():
             if args.output_report:
-                print_report(user) #  + " [Variation of '" +  + "']")
+                print_report(user + " : " + password_masking(pwd)) #  + " [Variation of '" +  + "']")
             else:
                 output_pass(user,pwd,"Admin: " + admin)
 
 # Output to STDOUT
 def output_pass(username,password,issue):
-
-
     if password.rstrip() == "":
         end = ""
     else:
@@ -111,7 +107,7 @@ def check_user_search(user,password,term):
 def check_exact_search(user,password,term):
     if term in password:
         if args.output_report:
-            print_report(user)
+            print_report(user + " : " + password_masking(password))
         else:
             output_pass(user,password,"Term " + term + " in password")
 
@@ -132,7 +128,7 @@ def check_org_name(user,password,org):
             continue
     if (search in pwd_unleet):
         if args.output_report:
-            print_report(user)
+            print_report(user + " : " + password_masking(password))
         else:
             output_pass(user,password,"Variation of org name " + org)
 
@@ -164,7 +160,7 @@ def check_basic_search(user,password,search):
             continue
     if (search in pwd_unleet):
         if args.output_report:
-            print_report(user)
+            print_report(user + " : " + password_masking(password))
         else:
             output_pass(user,password,"Variation of " + search)
 
@@ -196,7 +192,7 @@ def check_common_pass(user,password):
 
         if (common in pwd_unleet) and (x == 0):
             if args.output_report:
-                print_report(user)
+                print_report(user + " : " + password_masking(password))
             else:
                 out_issue = "Variation of " + common
                 output_pass(user,password,out_issue)
@@ -212,7 +208,7 @@ def check_date_day(user,password):
     for line in date_day_list:
         if (line in password.lower()) and (x == 0):
             if args.output_report:
-                print_report(user)
+                print_report(user + " : " + password_masking(password))
             else:
                 out_issue = "Variation of '" + line.rstrip() + "'"
                 output_pass(user,password,out_issue)
@@ -289,6 +285,24 @@ def check_frequency_length(full_list,length):
             z += 1
 
 
+def password_masking(x):
+    # Output Masking                
+    if len(x) >= 9:
+        mask_pwd = x[0:3] + ((len(x) - 6) * "*") + x[-3:]
+
+    elif len(x) >= 5 and len(x) <= 8:
+        mask_pwd = x[0:2] + ((len(x) - 4) * "*") + x[-2:]
+    elif len(x) == 4:
+        mask_pwd = x[0:1] + ((len(x) - 2) * "*") + x[-1:]       
+    elif len(x) == 3:
+        mask_pwd = x[0:1] + ((len(x) - 2) * "*") + x[-1:]                     
+    elif len(x) == 2:
+        mask_pwd = x[0:1] + ((len(x) - 1) * "*") 
+    else:
+        mask_pwd = x
+        
+    return mask_pwd
+
 def check_shared_pass(full_list):
     a = ([])
     for item in full_list:
@@ -304,18 +318,8 @@ def check_shared_pass(full_list):
             if x[1] == z:
                 #if ((len(x[1]) % 2) > 0):
                 
-                # Output Masking                
-                if len(x[1]) >= 5:
-                    mask_pwd = x[1][0:2] + ((len(x[1]) - 4) * "*") + x[1][-2:]
-                elif len(x[1]) == 4:
-                    mask_pwd = x[1][0:1] + ((len(x[1]) - 2) * "*") + x[1][-1:]       
-                elif len(x[1]) == 3:
-                    mask_pwd = x[1][0:1] + ((len(x[1]) - 2) * "*") + x[1][-1:]                     
-                elif len(x[1]) == 2:
-                    mask_pwd = x[1][0:1] + ((len(x[1]) - 1) * "*")    
-                
                 if args.output_report:
-                    print_report(str(x[0]) + " : " + mask_pwd)
+                    print_report(str(x[0]) + " : " + password_masking(x[1]))
                 else:
                     output_pass(x[0],str(x[1]),"Password Re-Use")
 
