@@ -3,7 +3,7 @@
 
 __author__ = "Adam Govier"
 __license__ = "GPL"
-__version__ = "1.4.2"
+__version__ = "1.4.3"
 __maintainer__ = "ins1gn1a"
 __status__ = "Production"
 
@@ -224,7 +224,6 @@ def delimit_list(list):
         try:
             if (len(list_entry.split(":",2)[1]) >= 24) and (n == 0):
                 n += 1
-#                print (list_entry.split(":",2))
         except:
             n += 1
             
@@ -499,6 +498,12 @@ if __name__ == "__main__":
                         pwd = "*******BLANK-PASS*******"
                     check_admin(user,pwd)
 
+            if args.output_report and shared_count == 0:
+                print ("\nThe following user accounts were found to have a passwords set that are re-used within other user accounts (with '*' representing a masked character). Usually, this is a coincidence with accounts using 'standard' weak password (such as 'Password1' or 'qwerty123', however where privileged/administrative accounts are used these should be reviewed further: ")
+                shared_count += 1
+                check_shared_pass(full_list)
+
+
             print ("\nThe following user accounts were found to have a password that was a variation of a day or date (e.g. Monday01 or September2016):")
             for item in full_list:
                 user = item[0]
@@ -506,6 +511,16 @@ if __name__ == "__main__":
                 if pwd == "":
                     pwd = "*******BLANK-PASS*******"
                 check_date_day(user,pwd)
+                
+            if args.output_report and common_count == 0:
+                print ("\nThe following user accounts were found to have a password that was a variation of the most common user passwords, which can include 'password', 'letmein', '123456', 'admin', 'iloveyou', 'friday', or 'qwerty':")
+                common_count += 1
+            for item in full_list:
+                user = item[0]
+                pwd = item[1]
+                if pwd == "":
+                    pwd = "*******BLANK-PASS*******"
+                check_common_pass(user,pwd)
 
             sys.exit() # Skip analysis functions below
 
@@ -612,10 +627,9 @@ if __name__ == "__main__":
                     pwd = "*******BLANK-PASS*******"
                 check_user_as_pass(user,pwd)
 
-
-# Not working at the moment :(
-    if args.shared_pass:
-        if args.output_report and pass_count == 0:
-            print ("\nThe following user accounts were found to have a passwords set that are re-used within other user accounts (with '*' representing a masked character). Usually, this is a coincidence with accounts using 'standard' weak password (such as 'Password1' or 'qwerty123', however where privileged/administrative accounts are used these should be reviewed further: ")
-            shared_count += 1
-        check_shared_pass(full_list)
+        # Check for password reuse between accounts
+        if args.shared_pass:
+            if args.output_report and pass_count == 0:
+                print ("\nThe following user accounts were found to have a passwords set that are re-used within other user accounts (with '*' representing a masked character). Usually, this is a coincidence with accounts using 'standard' weak password (such as 'Password1' or 'qwerty123', however where privileged/administrative accounts are used these should be reviewed further: ")
+                shared_count += 1
+            check_shared_pass(full_list)
