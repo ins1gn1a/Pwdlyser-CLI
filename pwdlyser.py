@@ -3,7 +3,7 @@
 
 __author__ = "Adam Govier"
 __license__ = "GPL"
-__version__ = "2.0.0"
+__version__ = "2.0.1"
 __maintainer__ = "ins1gn1a"
 __status__ = "Production"
 
@@ -396,16 +396,21 @@ def check_character_analysis(full_list):
     
     
 def keyboard_patterns(full_list):
-    keyboard_list = ["hjkl","asdf","lkjh","qwerty","qwer","zaqwsx","zaqxsw","qazwsx","qazxsw","zxc","zxcvbn","zxcdsa","1qaz","2wsx","poiuy","mnbvc","plm","nkoplm","qwer1234"]
+    keyboard_list = ["hjkl","asdf","lkjh","qwerty","qwer","zaqwsx","zaqxsw","qazwsx","qazxsw","zxc","zxcvbn","zxcdsa","1qaz","2wsx","poiuy","mnbvc","plm","nkoplm","qwer1234","2468","1357","3579","0864"]
     
     for x in full_list:
+        count = 0
         for z in keyboard_list:
+            if count > 0:
+                continue
             if z.lower() in x[1].lower():
                 
                 if args.output_report:
                     print_report(str(x[0]) + " : " + password_masking(x[1]))
+                    count += 1
                 else:
                     output_pass(x[0],str(x[1]),"Keyboard Pattern " + z.rstrip())
+                    count += 1
 
 # Run main stuff
 if __name__ == "__main__":
