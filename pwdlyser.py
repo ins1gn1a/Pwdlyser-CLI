@@ -3,7 +3,7 @@
 
 __author__ = "Adam Govier"
 __license__ = "GPL"
-__version__ = "2.0.1"
+__version__ = "2.0.2"
 __maintainer__ = "ins1gn1a"
 __status__ = "Production"
 
@@ -90,7 +90,7 @@ def print_report(u):
 def check_min_length(password,min):
     if (len(password) < min) or (password.rstrip() == "*******BLANK-PASS*******"):
         if args.output_report:
-            print_report(user)
+            print_report(user + " : " + password_masking(pwd))
         else:
             output_pass(user,pwd,"Length < " + str(args.min_length))
 
@@ -282,20 +282,24 @@ def check_frequency_length(full_list,length):
 
 
 def password_masking(x):
-    # Output Masking                
-    if len(x) >= 9:
-        mask_pwd = x[0:3] + ((len(x) - 6) * "*") + x[-3:]
 
-    elif len(x) >= 5 and len(x) <= 8:
-        mask_pwd = x[0:2] + ((len(x) - 4) * "*") + x[-2:]
-    elif len(x) == 4:
-        mask_pwd = x[0:1] + ((len(x) - 2) * "*") + x[-1:]       
-    elif len(x) == 3:
-        mask_pwd = x[0:1] + ((len(x) - 2) * "*") + x[-1:]                     
-    elif len(x) == 2:
-        mask_pwd = x[0:1] + ((len(x) - 1) * "*") 
-    else:
+    if x == "*******BLANK-PASS*******":
         mask_pwd = x
+    else:
+        # Output Masking                
+        if len(x) >= 9:
+            mask_pwd = x[0:3] + ((len(x) - 6) * "*") + x[-3:]
+
+        elif len(x) >= 5 and len(x) <= 8:
+            mask_pwd = x[0:2] + ((len(x) - 4) * "*") + x[-2:]
+        elif len(x) == 4:
+            mask_pwd = x[0:1] + ((len(x) - 2) * "*") + x[-1:]       
+        elif len(x) == 3:
+            mask_pwd = x[0:1] + ((len(x) - 2) * "*") + x[-1:]                     
+        elif len(x) == 2:
+            mask_pwd = x[0:1] + ((len(x) - 1) * "*") 
+        else:
+            mask_pwd = x
         
     return mask_pwd
 
@@ -486,7 +490,7 @@ if __name__ == "__main__":
             print ("The following passwords were the 15 most commonly used passwords that were able to be obtained:")
             check_frequency_analysis(full_list,15)
 
-            print ("\nThe length of the following user account passwords does not meet the recommended minimum of 9 characters:")
+            print ("\nThe length of the following user accounts have passwords set that do not meet the recommended minimum of 9 characters:")
             min_count = 9
             for item in full_list:
                 user = item[0]
@@ -548,7 +552,7 @@ if __name__ == "__main__":
         # Check for passwords that don't meet Min Length
         if (args.min_length is not None):
             if args.output_report and min_count == 0:
-                print ("\nThe length of the following user account passwords does not meet the required minimum of " + str(args.min_length) + " characters:")
+                print ("\nThe length of the following user accounts have passwords set that do not meet the required minimum of " + str(args.min_length) + " characters:")
                 min_count += 1
             for item in full_list:
                 user = item[0]
