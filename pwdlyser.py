@@ -3,14 +3,10 @@
 
 __author__ = "Adam Govier"
 __license__ = "GPL"
-__version__ = "1.4.3"
+__version__ = "2.0.0"
 __maintainer__ = "ins1gn1a"
 __status__ = "Production"
 
-'''
-To Do:
-* Keyboard patterns: e.g. zxcdsa, asdfjkl;
-'''
 
 import sys, os
 import argparse
@@ -29,6 +25,7 @@ parser.add_argument('--date',dest='date_day',help='Check for common date/day pas
 parser.add_argument('--exact',dest='exact_search',help='Perform a search using the exact string.',required=False)
 parser.add_argument('-f','--frequency',dest='freq_anal',help='Perform frequency analysis',required=False,type=int)
 parser.add_argument('-fl','--length-frequency',dest='freq_len',help='Perform frequency analysis on password length',required=False,type=int)
+parser.add_argument('-k','--keyboard-pattern',dest='keyboard_pattern',help='Identify common keyboard pattern usage within password lists',required=False,action='store_true',default=False)
 parser.add_argument('-l','--length',dest='min_length',help='Display passwords that do not meet the minimum length',type=int,required=False)
 parser.add_argument('-o','--org-name',dest='org_name',help='Enter the organisation name to identify any users that will be using a variation of the word for their password. Note: False Positives are possible',required=False)
 parser.add_argument('-oR',dest='output_report',help='Output format set for reporting with "- " prefix',action='store_true',default=False,required=False)
@@ -396,6 +393,19 @@ def check_character_analysis(full_list):
                 output_pass(str(pair[0]),str(pair[1]),"")
             w += 1
     print ("")
+    
+    
+def keyboard_patterns(full_list):
+    keyboard_list = ["hjkl","asdf","lkjh","qwerty","qwer","zaqwsx","zaqxsw","qazwsx","qazxsw","zxc","zxcvbn","zxcdsa","1qaz","2wsx","poiuy","mnbvc","plm","nkoplm","qwer1234"]
+    
+    for x in full_list:
+        for z in keyboard_list:
+            if z.lower() in x[1].lower():
+                
+                if args.output_report:
+                    print_report(str(x[0]) + " : " + password_masking(x[1]))
+                else:
+                    output_pass(x[0],str(x[1]),"Keyboard Pattern " + z.rstrip())
 
 # Run main stuff
 if __name__ == "__main__":
@@ -418,6 +428,7 @@ if __name__ == "__main__":
     pass_count = 0
     date_day_count = 0
     shared_count = 0
+    keyboard_count = 0
 
     if args.output_report is False:
         if ((args.freq_anal is None) and (args.freq_len is None)):
@@ -521,6 +532,11 @@ if __name__ == "__main__":
                 if pwd == "":
                     pwd = "*******BLANK-PASS*******"
                 check_common_pass(user,pwd)
+                
+            if args.output_report and keyboard_count == 0:
+                print ("\nThe following user accounts were identified as having passwords that utilise common keyboard patterns such as qwer, zxcvbn, qazwsx, etc.: ")
+                keyboard_count += 1
+            keyboard_patterns(full_list)
 
             sys.exit() # Skip analysis functions below
 
@@ -625,11 +641,17 @@ if __name__ == "__main__":
                 pwd = item[1]
                 if pwd == "":
                     pwd = "*******BLANK-PASS*******"
-                check_user_as_pass(user,pwd)
+            check_user_as_pass(user,pwd)
 
         # Check for password reuse between accounts
         if args.shared_pass:
-            if args.output_report and pass_count == 0:
+            if args.output_report and shared_count == 0:
                 print ("\nThe following user accounts were found to have a passwords set that are re-used within other user accounts (with '*' representing a masked character). Usually, this is a coincidence with accounts using 'standard' weak password (such as 'Password1' or 'qwerty123', however where privileged/administrative accounts are used these should be reviewed further: ")
                 shared_count += 1
             check_shared_pass(full_list)
+            
+        if args.keyboard_pattern:
+            if args.output_report and keyboard_count == 0:
+                print ("\nThe following user accounts were identified as having passwords that utilise common keyboard patterns such as qwer, zxcvbn, qazwsx, etc.: ")
+                keyboard_count += 1
+            keyboard_patterns(full_list)
