@@ -3,7 +3,7 @@
 
 __author__ = "Adam Govier"
 __license__ = "GPL"
-__version__ = "2.0.2"
+__version__ = "2.0.3"
 __maintainer__ = "ins1gn1a"
 __status__ = "Production"
 
@@ -145,6 +145,7 @@ def check_basic_search(user,password,search):
     x = 0
     pwd_unleet = password
     leet_list = reverse_leet_speak()
+    
     for line in leet_list:
         if "," in line:
             char_change = line.split(",")
@@ -535,17 +536,17 @@ if __name__ == "__main__":
             if args.output_report and common_count == 0:
                 print ("\nThe following user accounts were found to have a password that was a variation of the most common user passwords, which can include 'password', 'letmein', '123456', 'admin', 'iloveyou', 'friday', or 'qwerty':")
                 common_count += 1
-            for item in full_list:
-                user = item[0]
-                pwd = item[1]
-                if pwd == "":
-                    pwd = "*******BLANK-PASS*******"
-                check_common_pass(user,pwd)
+                for item in full_list:
+                    user = item[0]
+                    pwd = item[1]
+                    if pwd == "":
+                        pwd = "*******BLANK-PASS*******"
+                    check_common_pass(user,pwd)
                 
             if args.output_report and keyboard_count == 0:
                 print ("\nThe following user accounts were identified as having passwords that utilise common keyboard patterns such as qwer, zxcvbn, qazwsx, etc.: ")
                 keyboard_count += 1
-            keyboard_patterns(full_list)
+                keyboard_patterns(full_list)
 
             sys.exit() # Skip analysis functions below
 
@@ -650,7 +651,7 @@ if __name__ == "__main__":
                 pwd = item[1]
                 if pwd == "":
                     pwd = "*******BLANK-PASS*******"
-            check_user_as_pass(user,pwd)
+                check_user_as_pass(user,pwd)
 
         # Check for password reuse between accounts
         if args.shared_pass:
