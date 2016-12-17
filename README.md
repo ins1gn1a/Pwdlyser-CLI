@@ -28,43 +28,45 @@ To just identify the top [num] of passwords, i.e. frequency analysis, use the ``
 Other options can be seen within the ```-h``` menu or below:
 
 ```
-usage: pwdlyser.py [-h] -p PASS_LIST [-o ORG_NAME] [-l MIN_LENGTH] [-A]
-                   [-s BASIC_SEARCH] [-oR] [-c] [-f FREQ_ANAL]
-                   [--exact EXACT_SEARCH] [-u USER_SEARCH]
-                   [--admin ADMIN_PATH] [-up] [-fl FREQ_LEN] [--char-analysis]
+usage: pwdlyser.py [-h] [--all] [--admin ADMIN_PATH] [-c] [--char-analysis]
+                   [--date] [--exact EXACT_SEARCH] [-f FREQ_ANAL]
+                   [-fl FREQ_LEN] [-l MIN_LENGTH] [-o ORG_NAME] [-oR] -p
+                   PASS_LIST [-S BASIC_SEARCH] [-s] [-u USER_SEARCH] [-up]
 
 Password Analyser
 
 optional arguments:
   -h, --help            show this help message and exit
-  -p PASS_LIST, --pass-list PASS_LIST
-                        Enter the path to the list of passwords, either in the
-                        format of passwords, or username:password.
+  --all, -A             Print only usernames
+  --admin ADMIN_PATH    Import line separated list of Admin usernames to check
+                        password list
+  -c, --common          Check against list of common passwords
+  --char-analysis       Perform character-level analysis
+  --date                Check for common date/day passwords
+  --exact EXACT_SEARCH  Perform a search using the exact string.
+  -f FREQ_ANAL, --frequency FREQ_ANAL
+                        Perform frequency analysis
+  -fl FREQ_LEN, --length-frequency FREQ_LEN
+                        Perform frequency analysis on password length
+  -l MIN_LENGTH, --length MIN_LENGTH
+                        Display passwords that do not meet the minimum length
   -o ORG_NAME, --org-name ORG_NAME
                         Enter the organisation name to identify any users that
                         will be using a variation of the word for their
                         password. Note: False Positives are possible
-  -l MIN_LENGTH, --length MIN_LENGTH
-                        Display passwords that do not meet the minimum length
-  -A, --all             Print only usernames
-  -s BASIC_SEARCH, --search BASIC_SEARCH
+  -oR                   Output format set for reporting with "- " prefix
+  -p PASS_LIST, --pass-list PASS_LIST
+                        Enter the path to the list of passwords, either in the
+                        format of passwords, or username:password.
+  -S BASIC_SEARCH, --search BASIC_SEARCH
                         Run a basic search using a keyword. Non-alpha
                         characters will be stripped, i.e. syst3m will become
                         systm (although this will be compared against the same
                         stripped passwords
-  -oR                   Output format set for reporting with "- " prefix
-  -c, --common          Check against list of common passwords
-  -f FREQ_ANAL, --freq FREQ_ANAL
-                        Perform frequency analysis
-  --exact EXACT_SEARCH  Perform a search using the exact string.
+  -s, --shared          Display any reused/shared passwords.
   -u USER_SEARCH, --user USER_SEARCH
                         Return usernames that match string (case insensitive)
-  --admin ADMIN_PATH    Import line separated list of Admin usernames to check
-                        password list
   -up, --user-as-pass   Check for passwords that use part of the username
-  -fl FREQ_LEN, --freq-length FREQ_LEN
-                        Perform frequency analysis
-  --char-analysis       Perform character-level analysis
 ```
 
 ## Example Outputs
@@ -168,9 +170,8 @@ Friday924                     :    1
 The following user accounts were found to have a password that was a variation 
 of the most common user passwords, which can include 'password', 'letmein', 
 '123456', 'admin', 'iloveyou', 'friday', or 'qwerty':
-- user2
-- user5
-- user1
-- user9
-- user10
+- user2 : P4****rd1
+- user5 : Pa***ord
+- user1 : Dec****r16
+- user9 : zaq****23
 ```
