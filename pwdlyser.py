@@ -3,7 +3,7 @@
 
 __author__ = "Adam Govier"
 __license__ = "GPL"
-__version__ = "2.1.0"
+__version__ = "2.1.1"
 __maintainer__ = "ins1gn1a"
 __status__ = "Production"
 
@@ -448,8 +448,7 @@ def hashcat_mask_analysis(full_list):
             if args.output_report:
                 print_report(m[0] + " - Length:" + mask_length + " - Occurrence: " + mask_occurrence)
             else:
-                
-                output_pass(str(m[0]),"Length: " + mask_length,"Occurrence: " + mask_occurrence)
+                output_pass(str(m[0]),mask_length,mask_occurrence)
                 w += 1
     print ("")
         
@@ -494,8 +493,8 @@ if __name__ == "__main__":
     shared_count = 0
     keyboard_count = 0
 
-    if args.output_report is False:
-        if ((args.freq_anal is None) and (args.freq_len is None)):
+    if (args.output_report is False):
+        if ((args.freq_anal is None) and (args.freq_len is None) and (args.masks is None)):
             if args.char_anal:
                 output_pass("-" * 30,"-" * 30,"")
                 output_pass("Character","Count","")
@@ -527,6 +526,8 @@ if __name__ == "__main__":
             output_pass("Password Length","Frequency","")
             output_pass("-" * 30,"-" * 30,"")
             check_frequency_length(full_list,args.freq_len)
+            
+    
 
     elif args.char_anal:
         check_character_analysis(full_list)
@@ -602,8 +603,6 @@ if __name__ == "__main__":
                 keyboard_count += 1
                 keyboard_patterns(full_list)
                 
-            hashcat_mask_analysis(full_list)
-
             sys.exit() # Skip analysis functions below
 
         # Check for passwords that don't meet Min Length
@@ -723,4 +722,8 @@ if __name__ == "__main__":
             keyboard_patterns(full_list)
             
         if args.masks:
+            if args.output_report is False:
+                output_pass("-" * 30,"-" * 30,"-" * 30)
+                output_pass("Hashcat Mask","Mask Length","Occurrences")
+                output_pass("-" * 30,"-" * 30,"-" * 30)
             hashcat_mask_analysis(full_list)
