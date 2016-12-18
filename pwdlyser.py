@@ -3,7 +3,7 @@
 
 __author__ = "Adam Govier"
 __license__ = "GPL"
-__version__ = "2.0.3"
+__version__ = "2.1.0"
 __maintainer__ = "ins1gn1a"
 __status__ = "Production"
 
@@ -27,6 +27,7 @@ parser.add_argument('-f','--frequency',dest='freq_anal',help='Perform frequency 
 parser.add_argument('-fl','--length-frequency',dest='freq_len',help='Perform frequency analysis on password length',required=False,type=int)
 parser.add_argument('-k','--keyboard-pattern',dest='keyboard_pattern',help='Identify common keyboard pattern usage within password lists',required=False,action='store_true',default=False)
 parser.add_argument('-l','--length',dest='min_length',help='Display passwords that do not meet the minimum length',type=int,required=False)
+parser.add_argument('-m','--mask',dest='masks',help='Perform common Hashcat mask analysis',action='store_true',required=False,default=False)
 parser.add_argument('-o','--org-name',dest='org_name',help='Enter the organisation name to identify any users that will be using a variation of the word for their password. Note: False Positives are possible',required=False)
 parser.add_argument('-oR',dest='output_report',help='Output format set for reporting with "- " prefix',action='store_true',default=False,required=False)
 parser.add_argument('-p','--pass-list',dest='pass_list',help='Enter the path to the list of passwords, either in the format of passwords, or username:password.',required=True)
@@ -398,7 +399,60 @@ def check_character_analysis(full_list):
                 output_pass(str(pair[0]),str(pair[1]),"")
             w += 1
     print ("")
+
+def hashcat_mask_analysis(full_list):
+
+    words = Counter()
+    mask_list = []
+
+    for x in full_list:    
+        password = x[1]  
+        full_mask = "" 
+        mask = []     
+
+        # Loop through each character in password string and regex against mask type
+        for char in password:
+            if re.match("[a-z]", char) is not None:
+                mask.append("?l")
+            elif re.match("[A-Z]", char) is not None:
+                mask.append("?u")
+            elif re.match("[0-9]", char) is not None:
+                mask.append('?d')
+            elif re.match("[!@£$%^&*()\[\]:;\\\/]", char) is not None:
+                mask.append("?s")
+            else:
+                pass
+                
+        for z in mask:
+            full_mask = full_mask + z
+            
+        if (len(full_mask) / 2) == len(password):
+            mask_list.append(full_mask)
+                                
+    words.update(mask_list)
+    wordfreq = (words.most_common())
     
+    w = 0
+    ast = "*"
+    mostUsed = (wordfreq[0])[1]
+        
+    if args.output_report:
+        print ("The top 10 Hashcat masks:")
+        
+    
+
+    for m in wordfreq:
+        if w != 10: # Limit output to 10 most common entries
+            mask_length = str(int(len(m[0]) / 2))
+            mask_occurrence = str(m[1])
+            if args.output_report:
+                print_report(m[0] + " - Length:" + mask_length + " - Occurrence: " + mask_occurrence)
+            else:
+                
+                output_pass(str(m[0]),"Length: " + mask_length,"Occurrence: " + mask_occurrence)
+                w += 1
+    print ("")
+        
     
 def keyboard_patterns(full_list):
     keyboard_list = ["hjkl","asdf","lkjh","qwerty","qwer","zaqwsx","zaqxsw","qazwsx","qazxsw","zxc","zxcvbn","zxcdsa","1qaz","2wsx","poiuy","mnbvc","plm","nkoplm","qwer1234","2468","1357","3579","0864"]
@@ -547,6 +601,8 @@ if __name__ == "__main__":
                 print ("\nThe following user accounts were identified as having passwords that utilise common keyboard patterns such as qwer, zxcvbn, qazwsx, etc.: ")
                 keyboard_count += 1
                 keyboard_patterns(full_list)
+                
+            hashcat_mask_analysis(full_list)
 
             sys.exit() # Skip analysis functions below
 
@@ -665,3 +721,6 @@ if __name__ == "__main__":
                 print ("\nThe following user accounts were identified as having passwords that utilise common keyboard patterns such as qwer, zxcvbn, qazwsx, etc.: ")
                 keyboard_count += 1
             keyboard_patterns(full_list)
+            
+        if args.masks:
+            hashcat_mask_analysis(full_list)
