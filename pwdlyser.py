@@ -3,7 +3,7 @@
 
 __author__ = "Adam Govier"
 __license__ = "GPL"
-__version__ = "2.2.1"
+__version__ = "2.3.0"
 __maintainer__ = "ins1gn1a"
 __status__ = "Production"
 
@@ -15,6 +15,7 @@ import re
 from collections import Counter
 from collections import defaultdict
 import collections
+import math
 
 parser = argparse.ArgumentParser(description='Password Analyser')
 parser.add_argument('--all','-A',dest='print_all',help='Print only usernames',action='store_true',required=False)
@@ -22,6 +23,7 @@ parser.add_argument('--admin',dest='admin_path',help='Import line separated list
 parser.add_argument('-c','--common',dest='common_pass',help='Check against list of common passwords',action='store_true',default=False,required=False)
 parser.add_argument('--char-analysis',dest='char_anal',help='Perform character-level analysis',required=False,action='store_true',default=False)
 parser.add_argument('--date',dest='date_day',help='Check for common date/day passwords',required=False,action='store_true',default=False)
+parser.add_argument('-e','--entropy',dest='entropy',help='Output estimated entropy for the top 10 passwords (by frequency used)',action='store_true',default=False)
 parser.add_argument('--exact',dest='exact_search',help='Perform a search using the exact string.',required=False)
 parser.add_argument('-f','--frequency',dest='freq_anal',help='Perform frequency analysis',required=False,type=int)
 parser.add_argument('-fl','--length-frequency',dest='freq_len',help='Perform frequency analysis on password length',required=False,type=int)
@@ -499,6 +501,68 @@ def remove_end_numeric(pass_list):
     for pwd in cleaned_pass_list:
         f.write(pwd + '\n')
     f.close()
+    
+def entropy_calculate(full_list):
+    words = Counter()
+    entropy_list = []
+    for x in full_list:
+        temp_list = []
+        pwd = x[1]
+        L = len(pwd)
+        char_space = 0
+        for n in pwd:
+            if re.match('[a-z]',n):
+                char_space += 26
+            elif re.match('[A-Z]',n):
+                char_space += 26
+            elif re.match('[0-9]',n):
+                char_space += 10
+            else: # 33 Special chars as per Hashcat !"#$%&'()*+,-./:;<=>?@[\]^_`{|}~ (including space)
+                char_space += 33
+        entropy = L * math.log2(char_space)
+        entropy_list.append([int(entropy),pwd])
+
+
+    sorted_ent_list = sorted(entropy_list, reverse=True)
+    if args.output_report:
+        print ("\nThe following items are the top 10 estimated 'strongest' passwords (by entropy) that were able to be computed: ")
+    else:
+        output_pass("-" * 30,"-" * 30,"")
+        output_pass("Entropy","Password","")
+        output_pass("-" * 30,"-" * 30,"")
+        
+    w = 0 # Max output for top passwords
+    for m in sorted_ent_list:
+
+        pass_ent = m[0]
+        if w != 10: # Limit output to 10 most common entries
+            if args.output_report:
+                print_report(str(pass_ent) + ' bits - ' + password_masking(m[1]))
+                w += 1
+            else:
+                output_pass(str(pass_ent) + " bits",str(m[1]),"")
+                w += 1
+
+    sorted_ent_list = sorted(entropy_list, reverse=False)
+    if args.output_report:
+        print ("\nThe following items are the top 10 estimated 'weakest' passwords (by entropy) that were able to be computed: ")
+    else:
+        print ('\n')
+        output_pass("-" * 30,"-" * 30,"")
+        output_pass("Entropy","Password","")
+        output_pass("-" * 30,"-" * 30,"")
+        
+    w = 0 # Max output for top passwords
+    for m in sorted_ent_list:
+
+        pass_ent = m[0]
+        if w != 10: # Limit output to 10 most common entries
+            if args.output_report:
+                print_report(str(pass_ent) + ' bits - ' + password_masking(m[1]))
+                w += 1
+            else:
+                output_pass(str(pass_ent) + " bits",str(m[1]),"")
+                w += 1
 
 # Run main stuff
 if __name__ == "__main__":
@@ -761,3 +825,7 @@ if __name__ == "__main__":
         if args.clean_pass_wordlists:
             print ("\n[*] Cleaned " + str(len(full_list)) + " words to 'wordlist-cleaned.txt'")
             remove_end_numeric(full_list)
+
+        if args.entropy:
+            entropy_calculate(full_list)
+            
