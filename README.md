@@ -29,9 +29,10 @@ Other options can be seen within the ```-h``` menu or below:
 
 ```
 usage: pwdlyser.py [-h] [--all] [--admin ADMIN_PATH] [-c] [--char-analysis]
-                   [--date] [--exact EXACT_SEARCH] [-f FREQ_ANAL]
-                   [-fl FREQ_LEN] [-l MIN_LENGTH] [-o ORG_NAME] [-oR] -p
-                   PASS_LIST [-S BASIC_SEARCH] [-s] [-u USER_SEARCH] [-up]
+                   [--date] [-e] [--exact EXACT_SEARCH] [-f FREQ_ANAL]
+                   [-fl FREQ_LEN] [-k] [-l MIN_LENGTH] [-m]
+                   [-mc MASKS_RESULTS_COUNT] [-o ORG_NAME] [-oR] -p PASS_LIST
+                   [-S BASIC_SEARCH] [-s] [-u USER_SEARCH] [-up] [-w]
 
 Password Analyser
 
@@ -43,13 +44,22 @@ optional arguments:
   -c, --common          Check against list of common passwords
   --char-analysis       Perform character-level analysis
   --date                Check for common date/day passwords
+  -e, --entropy         Output estimated entropy for the top 10 passwords (by
+                        frequency used)
   --exact EXACT_SEARCH  Perform a search using the exact string.
   -f FREQ_ANAL, --frequency FREQ_ANAL
                         Perform frequency analysis
   -fl FREQ_LEN, --length-frequency FREQ_LEN
                         Perform frequency analysis on password length
+  -k, --keyboard-pattern
+                        Identify common keyboard pattern usage within password
+                        lists
   -l MIN_LENGTH, --length MIN_LENGTH
                         Display passwords that do not meet the minimum length
+  -m, --mask            Perform common Hashcat mask analysis
+  -mc MASKS_RESULTS_COUNT, --mask-count MASKS_RESULTS_COUNT
+                        (Optional) Specify the number of mask to output for
+                        the -m / --masks option
   -o ORG_NAME, --org-name ORG_NAME
                         Enter the organisation name to identify any users that
                         will be using a variation of the word for their
@@ -67,6 +77,8 @@ optional arguments:
   -u USER_SEARCH, --user USER_SEARCH
                         Return usernames that match string (case insensitive)
   -up, --user-as-pass   Check for passwords that use part of the username
+  -w, --clean-wordlist  Enable this flag to append cleaned (no trailing
+                        numerics) to a wordlist at wordlist-cleaned.txt
 ```
 
 ## Example Outputs
