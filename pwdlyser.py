@@ -3,7 +3,7 @@
 
 __author__ = "Adam Govier"
 __license__ = "GPL"
-__version__ = "2.1.1"
+__version__ = "2.2.0"
 __maintainer__ = "ins1gn1a"
 __status__ = "Production"
 
@@ -28,6 +28,7 @@ parser.add_argument('-fl','--length-frequency',dest='freq_len',help='Perform fre
 parser.add_argument('-k','--keyboard-pattern',dest='keyboard_pattern',help='Identify common keyboard pattern usage within password lists',required=False,action='store_true',default=False)
 parser.add_argument('-l','--length',dest='min_length',help='Display passwords that do not meet the minimum length',type=int,required=False)
 parser.add_argument('-m','--mask',dest='masks',help='Perform common Hashcat mask analysis',action='store_true',required=False,default=False)
+parser.add_argument('-mc','--mask-count',dest='masks_results_count',help='(Optional) Specify the number of mask to output for the -m / --masks option',default=25,required=False,type=int)
 parser.add_argument('-o','--org-name',dest='org_name',help='Enter the organisation name to identify any users that will be using a variation of the word for their password. Note: False Positives are possible',required=False)
 parser.add_argument('-oR',dest='output_report',help='Output format set for reporting with "- " prefix',action='store_true',default=False,required=False)
 parser.add_argument('-p','--pass-list',dest='pass_list',help='Enter the path to the list of passwords, either in the format of passwords, or username:password.',required=True)
@@ -35,6 +36,7 @@ parser.add_argument('-S','--search',dest='basic_search',help='Run a basic search
 parser.add_argument('-s','--shared',dest='shared_pass',help='Display any reused/shared passwords.',required=False,action='store_true',default=False)
 parser.add_argument('-u','--user',dest='user_search',help='Return usernames that match string (case insensitive)',required=False)
 parser.add_argument('-up','--user-as-pass',dest='user_as_pass',help='Check for passwords that use part of the username',required=False,action='store_true',default=False)
+parser.add_argument('-w','--clean-wordlist',dest='clean_pass_wordlists',help='Enable this flag to append cleaned (no trailing numerics) to a wordlist at wordlist-cleaned.txt',required=False,action='store_true',default=False)
 args = parser.parse_args()
 
 pass_list = args.pass_list
@@ -439,10 +441,9 @@ def hashcat_mask_analysis(full_list):
     if args.output_report:
         print ("The top 10 Hashcat masks:")
         
-    
 
     for m in wordfreq:
-        if w != 10: # Limit output to 10 most common entries
+        if w != args.masks_results_count: # Limit output to 10 most common entries
             mask_length = str(int(len(m[0]) / 2))
             mask_occurrence = str(m[1])
             if args.output_report:
@@ -469,6 +470,26 @@ def keyboard_patterns(full_list):
                 else:
                     output_pass(x[0],str(x[1]),"Keyboard Pattern " + z.rstrip())
                     count += 1
+
+def remove_end_numeric(pass_list):
+    f = open('wordlist-cleaned.txt','w')
+    cleaned_pass_list = []
+
+    for p in pass_list:
+        p = p[1]
+        length = (len(p) - 1)
+        last_alpha = length
+    
+        for n in range(0,length):     
+            temp_char = p[n]
+                
+            if re.match("[a-zA-Z]",temp_char):
+                last_alpha = n + 1
+        final_pass = p[:last_alpha]
+        cleaned_pass_list.append(final_pass)
+    for pwd in cleaned_pass_list:
+        f.write(pwd + '\n')
+    f.close() 
 
 # Run main stuff
 if __name__ == "__main__":
@@ -727,3 +748,7 @@ if __name__ == "__main__":
                 output_pass("Hashcat Mask","Mask Length","Occurrences")
                 output_pass("-" * 30,"-" * 30,"-" * 30)
             hashcat_mask_analysis(full_list)
+
+        if args.clean_pass_wordlists:
+            print ("\n[*] Cleaned " + str(len(full_list)) + " words to 'wordlist-cleaned.txt'")
+            remove_end_numeric(full_list)
