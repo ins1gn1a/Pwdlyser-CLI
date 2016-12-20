@@ -3,7 +3,7 @@
 
 __author__ = "Adam Govier"
 __license__ = "GPL"
-__version__ = "2.2.0"
+__version__ = "2.2.1"
 __maintainer__ = "ins1gn1a"
 __status__ = "Production"
 
@@ -479,17 +479,26 @@ def remove_end_numeric(pass_list):
         p = p[1]
         length = (len(p) - 1)
         last_alpha = length
-    
-        for n in range(0,length):     
+        z = False
+
+        break_check_length = len(p)
+
+        if re.match("[a-zA-Z]",p[length]):
+            cleaned_pass_list.append(p)
+            z = True
+
+        for n in range(0,length):
             temp_char = p[n]
-                
+
             if re.match("[a-zA-Z]",temp_char):
                 last_alpha = n + 1
+
         final_pass = p[:last_alpha]
-        cleaned_pass_list.append(final_pass)
+        if z is False:
+            cleaned_pass_list.append(final_pass)
     for pwd in cleaned_pass_list:
         f.write(pwd + '\n')
-    f.close() 
+    f.close()
 
 # Run main stuff
 if __name__ == "__main__":
