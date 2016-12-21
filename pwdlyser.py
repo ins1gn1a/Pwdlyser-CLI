@@ -3,7 +3,7 @@
 
 __author__ = "Adam Govier"
 __license__ = "GPL"
-__version__ = "2.3.0"
+__version__ = "2.3.1"
 __maintainer__ = "ins1gn1a"
 __status__ = "Production"
 
@@ -510,19 +510,32 @@ def entropy_calculate(full_list):
         pwd = x[1]
         L = len(pwd)
         char_space = 0
-        for n in pwd:
-            if re.match('[a-z]',n):
-                char_space += 26
-            elif re.match('[A-Z]',n):
-                char_space += 26
-            elif re.match('[0-9]',n):
-                char_space += 10
-            else: # 33 Special chars as per Hashcat !"#$%&'()*+,-./:;<=>?@[\]^_`{|}~ (including space)
-                char_space += 33
-        entropy = L * math.log2(char_space)
-        entropy_list.append([int(entropy),pwd])
-
-
+        e = []
+        count = 0
+        for c in pwd:
+            if re.match('[a-z]',c):
+                e.append(math.log2(26))
+            elif re.match('[A-Z]',c):
+                e.append(math.log2(26))
+            elif re.match('[0-9]',c):
+                e.append(math.log2(10))
+            else:
+                e.append(math.log2(33))
+        # for n in pwd:
+#             if re.match('[a-z]',n):
+#                 char_space += 26
+#             elif re.match('[A-Z]',n):
+#                 char_space += 26
+#             elif re.match('[0-9]',n):
+#                 char_space += 10
+#             else: # 33 Special chars as per Hashcat !"#$%&'()*+,-./:;<=>?@[\]^_`{|}~ (including space)
+#                 char_space += 33
+        #entropy = L * math.log2(char_space)
+        
+        for x in e:
+            count += x
+        entropy_list.append([int(count),pwd])
+   
     sorted_ent_list = sorted(entropy_list, reverse=True)
     if args.output_report:
         print ("\nThe following items are the top 10 estimated 'strongest' passwords (by entropy) that were able to be computed: ")
