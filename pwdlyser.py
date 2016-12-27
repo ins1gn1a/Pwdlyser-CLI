@@ -223,21 +223,24 @@ def delimit_list(list):
     list = import_file_to_list(list)
     out_list = []
     n = 0
-    for list_entry in list:
-        try:
-            if (len(list_entry.split(":",2)[1]) >= 24) and (n == 0):
+    try:
+        for list_entry in list:
+            try:
+                if (len(list_entry.split(":",2)[1]) >= 24) and (n == 0):
+                    n += 1
+            except:
                 n += 1
-        except:
-            n += 1
             
-        # Delimits with hash username:hash:password or username:password
-        if n != 0:
-            list_stuff = [list_entry.split(":",2)[0],list_entry.split(":",2)[2]]
-        else:
-            list_stuff = list_entry.split(":",1)
-        if (len(list_stuff)) == 1:
-            list_stuff.append("")
-        out_list.append(list_stuff)
+            # Delimits with hash username:hash:password or username:password
+            if n != 0:
+                list_stuff = [list_entry.split(":",2)[0],list_entry.split(":",2)[2]]
+            else:
+                list_stuff = list_entry.split(":",1)
+            if (len(list_stuff)) == 1:
+                list_stuff.append("")
+            out_list.append(list_stuff)
+    except:
+        sys.exit("Cannot delimit the input list. Check that input is format of either 'username:password' or 'username:hash:password'.")
     return (out_list)
 
 # Perform frequency analysis for [num]
