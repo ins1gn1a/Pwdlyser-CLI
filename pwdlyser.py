@@ -3,7 +3,7 @@
 
 __author__ = "Adam Govier"
 __license__ = "GPL"
-__version__ = "2.3.1"
+__version__ = "2.3.2"
 __maintainer__ = "ins1gn1a"
 __status__ = "Production"
 
@@ -487,6 +487,9 @@ def remove_end_numeric(pass_list):
         z = False
 
         break_check_length = len(p)
+        
+        if (len(p) == 0):
+            continue
 
         if re.match("[a-zA-Z]",p[length]):
             cleaned_pass_list.append(p)
