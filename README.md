@@ -2,9 +2,7 @@
 The pwdlyser tool is a Python-based CLI script that was intended to be used to somewhat automate the arduous process of manually reviewing cracked passwords during password audits or for penetration testing. It is by no-means a perfect tool and is an accompaniment to actual manual testing (i.e. there are likely some false positives/negatives and I don't want to be held responsible). Use at your own discretion, blah blah etc.
 
 ## Input: Passwords
-I originally did intend for either ```passwords```, ```username:passwords```, and ```username:hash:passwords``` to be processed but to be honest for what I use it for I would only really ever use username:password (":") delimited lists so that's what I focused on, although I think there are remnants of code should anyone want to modify it back to the original intentions.
-
-Lists can be specified using the ```-p [path/to/file]``` argument, and should be colon delimited with username followed by password. No headers are necessary.
+Lists can be specified using the ```-p [path/to/file]``` argument, and should be colon delimited with username:password, or username:hash:password. No headers are necessary.
 
 Should you only want to analyse passwords, just enter a colon (":") before each password in the list, which will just output blank usernames. To automate this I've added a script 'add-delimit.py' that will input a list of passwords (only) and append the colon to the start.
 
