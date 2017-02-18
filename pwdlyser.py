@@ -3,7 +3,7 @@
 
 __author__ = "Adam Govier"
 __license__ = "GPL"
-__version__ = "2.3.2"
+__version__ = "2.3.3"
 __maintainer__ = "ins1gn1a"
 __status__ = "Production"
 
@@ -223,24 +223,41 @@ def delimit_list(list):
     list = import_file_to_list(list)
     out_list = []
     n = 0
+    file_line_count = 0
+    check_hash_delimit = True
     try:
         for list_entry in list:
-            try:
-                if (len(list_entry.split(":",2)[1]) >= 24) and (n == 0):
-                    n += 1
-            except:
-                n += 1
+            file_line_count += 1
+            if check_hash_delimit:
+                try:
+                    # Check if user:hash:pass - return n += 1 if True
+                    if (len(list_entry.split(":",2)[1]) >= 24) and (len(list_entry.split(":",2)[2]) > 0):
+                        n += 1
+                        print ("[!] Running analysis with 'user:hash:password' delimitation\n")
+                        check_hash_delimit = False
+                    else:
+                        print ("[!] Running analysis with 'user:password' delimitation\n")
+                        check_hash_delimit = False
+                except:
+                    n = 0
+                    check_hash_delimit = False
             
             # Delimits with hash username:hash:password or username:password
             if n != 0:
-                list_stuff = [list_entry.split(":",2)[0],list_entry.split(":",2)[2]]
+                try: # Try to delimit user:hash:password
+                    list_stuff = [list_entry.split(":",2)[0],list_entry.split(":",2)[2]]
+                except: # Except try user:password
+                    try:
+                        list_stuff = [list_entry.split(":",2)[0],list_entry.split(":",2)[1]]
+                    except: # Everything has gone wrong
+                        print ("[!] Can't split input line: " + str(file_line_count)) 
             else:
                 list_stuff = list_entry.split(":",1)
-            if (len(list_stuff)) == 1:
+            if (len(list_stuff)) == 1: # Can't remember what this does
                 list_stuff.append("")
             out_list.append(list_stuff)
     except:
-        sys.exit("Cannot delimit the input list. Check that input is format of either 'username:password' or 'username:hash:password'.")
+        sys.exit("[!] Cannot delimit the input list. Check that input is format of either 'username:password' or 'username:hash:password'.")
     return (out_list)
 
 # Perform frequency analysis for [num]
