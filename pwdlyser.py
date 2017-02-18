@@ -3,7 +3,7 @@
 
 __author__ = "Adam Govier"
 __license__ = "GPL"
-__version__ = "2.3.2"
+__version__ = "2.4.0"
 __maintainer__ = "ins1gn1a"
 __status__ = "Production"
 
@@ -92,7 +92,7 @@ def print_report(u):
     print ("- " + u)
 
 # Check for inputted min length
-def check_min_length(password,min):
+def check_min_length(user,password,min):
     if (len(password) < min) or (password.rstrip() == "*******BLANK-PASS*******"):
         if args.output_report:
             print_report(user + " : " + password_masking(pwd))
@@ -132,7 +132,7 @@ def check_org_name(user,password,org):
         if args.output_report:
             print_report(user + " : " + password_masking(password))
         else:
-            output_pass(user,password,"Variation of org name " + org)
+            output_pass(user,password,"Variation of: " + org)
 
 # Imports leet config file and processes each mutation
 def reverse_leet_speak():
@@ -223,24 +223,41 @@ def delimit_list(list):
     list = import_file_to_list(list)
     out_list = []
     n = 0
+    file_line_count = 0
+    check_hash_delimit = True
     try:
         for list_entry in list:
-            try:
-                if (len(list_entry.split(":",2)[1]) >= 24) and (n == 0):
-                    n += 1
-            except:
-                n += 1
+            file_line_count += 1
+            if check_hash_delimit:
+                try:
+                    # Check if user:hash:pass - return n += 1 if True
+                    if (len(list_entry.split(":",2)[1]) >= 24) and (len(list_entry.split(":",2)[2]) > 0):
+                        n += 1
+                        print ("[!] Running analysis with 'user:hash:password' delimitation\n")
+                        check_hash_delimit = False
+                    else:
+                        print ("[!] Running analysis with 'user:password' delimitation\n")
+                        check_hash_delimit = False
+                except:
+                    n = 0
+                    check_hash_delimit = False
             
             # Delimits with hash username:hash:password or username:password
             if n != 0:
-                list_stuff = [list_entry.split(":",2)[0],list_entry.split(":",2)[2]]
+                try: # Try to delimit user:hash:password
+                    list_stuff = [list_entry.split(":",2)[0],list_entry.split(":",2)[2]]
+                except: # Except try user:password
+                    try:
+                        list_stuff = [list_entry.split(":",2)[0],list_entry.split(":",2)[1]]
+                    except: # Everything has gone wrong
+                        print ("[!] Can't split input line: " + str(file_line_count)) 
             else:
                 list_stuff = list_entry.split(":",1)
-            if (len(list_stuff)) == 1:
+            if (len(list_stuff)) == 1: # Can't remember what this does
                 list_stuff.append("")
             out_list.append(list_stuff)
     except:
-        sys.exit("Cannot delimit the input list. Check that input is format of either 'username:password' or 'username:hash:password'.")
+        sys.exit("[!] Cannot delimit the input list. Check that input is format of either 'username:password' or 'username:hash:password'.")
     return (out_list)
 
 # Perform frequency analysis for [num]
@@ -459,22 +476,21 @@ def hashcat_mask_analysis(full_list):
     print ("")
         
     
-def keyboard_patterns(full_list):
+def keyboard_patterns(user,pwd):
     keyboard_list = ["hjkl","asdf","lkjh","qwerty","qwer","zaqwsx","zaqxsw","qazwsx","qazxsw","zxc","zxcvbn","zxcdsa","1qaz","2wsx","poiuy","mnbvc","plm","nkoplm","qwer1234","2468","1357","3579","0864"]
     
-    for x in full_list:
-        count = 0
-        for z in keyboard_list:
-            if count > 0:
-                continue
-            if z.lower() in x[1].lower():
-                
-                if args.output_report:
-                    print_report(str(x[0]) + " : " + password_masking(x[1]))
-                    count += 1
-                else:
-                    output_pass(x[0],str(x[1]),"Keyboard Pattern " + z.rstrip())
-                    count += 1
+    count = 0
+    for z in keyboard_list:
+        if count > 0:
+            continue
+        if z.lower() in pwd.lower():
+            
+            if args.output_report:
+                print_report(str(user) + " : " + password_masking(pwd))
+                count += 1
+            else:
+                output_pass(user,str(pwd),"Keyboard Pattern " + z.rstrip())
+                count += 1
 
 def remove_end_numeric(pass_list):
     f = open('wordlist-cleaned.txt','w')
@@ -589,12 +605,11 @@ if __name__ == "__main__":
     print (banner)
 
     if int(columns) < 110:
-        sys.exit("Warning: Resize your terminal to be at least 110 columns wide. Currently it is " + columns + " columns wide.")
+        sys.exit("[!] Warning: Resize your terminal to be at least 110 columns wide. Currently it is " + columns + " columns wide.")
 
     # Retrieve list
     full_list = (delimit_list(pass_list))
     y = 0
-
     min_count = 0
     common_count = 0
     search_count = 0
@@ -605,19 +620,6 @@ if __name__ == "__main__":
     date_day_count = 0
     shared_count = 0
     keyboard_count = 0
-
-    if (args.output_report is False):
-        if ((args.freq_anal is None) and (args.freq_len is None) and (args.masks is None)):
-            if args.char_anal:
-                output_pass("-" * 30,"-" * 30,"")
-                output_pass("Character","Count","")
-                output_pass("-" * 30,"-" * 30,"")
-
-            elif (args.print_all is False):
-                # Headers
-                output_pass("-" * 30,"-" * 30,"-" * 30)
-                output_pass("Username","Password","Description")
-                output_pass("-" * 30,"-" * 30,"-" * 30)
 
     if args.freq_anal is not None:
         if args.output_report:
@@ -640,13 +642,12 @@ if __name__ == "__main__":
             output_pass("-" * 30,"-" * 30,"")
             check_frequency_length(full_list,args.freq_len)
             
-    
-
     elif args.char_anal:
         check_character_analysis(full_list)
         
     else:
         # Print everything and exit
+
         if args.print_all:
             args.output_report = True
 
@@ -666,7 +667,7 @@ if __name__ == "__main__":
                 pwd = item[1]
                 if pwd == "":
                     pwd = "*******BLANK-PASS*******"
-                check_min_length(pwd,min_count)
+                check_min_length(user,pwd,min_count)
 
             print ("\nThe following user accounts used a variation of the username as the password.")
             for item in full_list:
@@ -717,134 +718,142 @@ if __name__ == "__main__":
                 keyboard_patterns(full_list)
                 
             sys.exit() # Skip analysis functions below
-
-        # Check for passwords that don't meet Min Length
-        if (args.min_length is not None):
-            if args.output_report and min_count == 0:
-                print ("\nThe length of the following user accounts have passwords set that do not meet the required minimum of " + str(args.min_length) + " characters:")
-                min_count += 1
-            for item in full_list:
-                user = item[0]
-                pwd = item[1]
-                if pwd == "":
-                    pwd = "*******BLANK-PASS*******"
-                check_min_length(pwd,args.min_length)
-
-        # Check if Org name (or slight variation) is in list
-        if organisation is not None:
-            if args.output_report and org_count == 0:
-                print ("\nThe organisation name " + organisation + " appears within several passwords for the following accounts (within some variation):")
-                org_count += 1
-            for item in full_list:
-                user = item[0]
-                pwd = item[1]
-                if pwd == "":
-                    pwd = "*******BLANK-PASS*******"
-                check_org_name(user,pwd,organisation)
-
-        # Check for passwords via unleeted search
-        if args.basic_search is not None:
-            if args.output_report and search_count == 0:
-                print ("\nThe following user accounts were found to have a password that was some variation of the word/phrase: " + args.basic_search)
-                search_count += 1
-            for item in full_list:
-                user = item[0]
-                pwd = item[1]
-                if pwd == "":
-                    pwd = "*******BLANK-PASS*******"
-                check_basic_search(user,pwd,args.basic_search)
-
-        # Check for Common Passwords
-        if args.common_pass is True:
-            if args.output_report and common_count == 0:
-                print ("\nThe following user accounts were found to have a password that was a variation of the most common user passwords, which can include 'password', 'letmein', '123456', 'admin', 'iloveyou', 'friday', or 'qwerty':")
-                common_count += 1
-            for item in full_list:
-                user = item[0]
-                pwd = item[1]
-                if pwd == "":
-                    pwd = "*******BLANK-PASS*******"
-                check_common_pass(user,pwd)
-
-        # Check for Date/Day Passwords
-        if args.date_day is True:
-            if args.output_report and date_day_count == 0:
-                print ("\nThe following user accounts were found to have a password that was a variation of a day or date (e.g. Monday01 or September2016):")
-                date_day_count += 1
-            for item in full_list:
-                user = item[0]
-                pwd = item[1]
-                if pwd == "":
-                    pwd = "*******BLANK-PASS*******"
-                check_date_day(user,pwd)
-
-        # Search exact phrase or character
-        if args.exact_search is not None:
-            if args.output_report and exact_count == 0:
-                print ("\nThe following user accounts were found to have a password that contains the word/phrase " + args.exact_search + ":")
-                exact_count += 1
-            for item in full_list:
-                user = item[0]
-                pwd = item[1]
-                if pwd == "":
-                    pwd = "*******BLANK-PASS*******"
-                check_exact_search(user,pwd,args.exact_search)
-
-        # Check for username (basic search)
-        if args.user_search is not None:
-            for item in full_list:
-                user = item[0]
-                pwd = item[1]
-                check_user_search(user,pwd,args.user_search)
-
-        # Check if admins have had their passwords cracked
-        if args.admin_path is not None:
-            if args.output_report and admin_count == 0:
-                print ("\nThe following user accounts were identified as Domain Administrators (Domain Admins, Enterprise Admins, Administrators, etc) and were found to have weak passwords set: ")
-                admin_count += 1
-            for item in full_list:
-                user = item[0]
-                pwd = item[1]
-                if pwd == "":
-                    pwd = "*******BLANK-PASS*******"
-                check_admin(user,pwd)
-
-        # Check if password contains username
-        if args.user_as_pass:
-            if args.output_report and pass_count == 0:
-                print ("\nThe following user accounts were found to have a variation of their username set as their account password: ")
-                pass_count += 1
-            for item in full_list:
-                user = item[0]
-                pwd = item[1]
-                if pwd == "":
-                    pwd = "*******BLANK-PASS*******"
-                check_user_as_pass(user,pwd)
-
-        # Check for password reuse between accounts
-        if args.shared_pass:
-            if args.output_report and shared_count == 0:
-                print ("\nThe following user accounts were found to have a passwords set that are re-used within other user accounts (with '*' representing a masked character). Usually, this is a coincidence with accounts using 'standard' weak password (such as 'Password1' or 'qwerty123', however where privileged/administrative accounts are used these should be reviewed further: ")
-                shared_count += 1
-            check_shared_pass(full_list)
             
-        if args.keyboard_pattern:
-            if args.output_report and keyboard_count == 0:
-                print ("\nThe following user accounts were identified as having passwords that utilise common keyboard patterns such as qwer, zxcvbn, qazwsx, etc.: ")
-                keyboard_count += 1
-            keyboard_patterns(full_list)
-            
-        if args.masks:
-            if args.output_report is False:
-                output_pass("-" * 30,"-" * 30,"-" * 30)
-                output_pass("Hashcat Mask","Mask Length","Occurrences")
-                output_pass("-" * 30,"-" * 30,"-" * 30)
-            hashcat_mask_analysis(full_list)
+        else:
+            print_header = True
+            for item in full_list:
+                user = item[0]
+                pwd = item[1]
+                if pwd == "":
+                    pwd = "*******BLANK-PASS*******"
 
-        if args.clean_pass_wordlists:
-            print ("\n[*] Cleaned " + str(len(full_list)) + " words to 'wordlist-cleaned.txt'")
-            remove_end_numeric(full_list)
+                # Check for passwords that don't meet Min Length
+                if (args.min_length is not None):
+                    if args.output_report and print_header:
+                        print ("\nThe length of the following user accounts have passwords set that do not meet the required minimum of " + str(args.min_length) + " characters:")
+                    elif not args.output_report and print_header:
+                        output_pass("-" * 30,"-" * 30,"-" * 30)
+                        output_pass("Username","Password Length","Password Policy Length")
+                        output_pass("-" * 30,"-" * 30,"-" * 30)
+                    check_min_length(user,pwd,args.min_length)
 
-        if args.entropy:
-            entropy_calculate(full_list)
+                # Check if Org name (or slight variation) is in list
+                elif organisation is not None:
+                    if args.output_report and print_header:
+                        print ("\nThe organisation name " + organisation + " appears within several passwords for the following accounts (within some variation):")
+                    elif not args.output_report and print_header:                        
+                        output_pass("-" * 30,"-" * 30,"-" * 30)
+                        output_pass("Username","Password Length","Organisation Name Searched")
+                        output_pass("-" * 30,"-" * 30,"-" * 30)
+                    check_org_name(user,pwd,organisation)
+
+                # Check for passwords via unleeted search
+                elif args.basic_search is not None:
+                    if args.output_report and print_header:
+                        print ("\nThe following user accounts were found to have a password that was some variation of the word/phrase: " + args.basic_search)
+                    elif not args.output_report and print_header:
+                        output_pass("-" * 30,"-" * 30,"-" * 30)
+                        output_pass("Username","Password","Basic Search Term")
+                        output_pass("-" * 30,"-" * 30,"-" * 30)
+                    check_basic_search(user,pwd,args.basic_search)
+
+                # Check for Common Passwords
+                elif args.common_pass is True:
+                    if args.output_report and print_header:
+                        print ("\nThe following user accounts were found to have a password that was a variation of the most common user passwords, which can include 'password', 'letmein', '123456', 'admin', 'iloveyou', 'friday', or 'qwerty':")
+                    elif not args.output_report and print_header:
+                        output_pass("-" * 30,"-" * 30,"-" * 30)
+                        output_pass("Username","Password","Common Password Variance")
+                        output_pass("-" * 30,"-" * 30,"-" * 30)
+                    check_common_pass(user,pwd)
+
+                # Check for Date/Day Passwords
+                elif args.date_day is True:
+                    if args.output_report and print_header:
+                        print ("\nThe following user accounts were found to have a password that was a variation of a day or date (e.g. Monday01 or September2016):")
+                    elif not args.output_report and print_header:
+                        output_pass("-" * 30,"-" * 30,"-" * 30)
+                        output_pass("Username","Password","Common Password Variance")
+                        output_pass("-" * 30,"-" * 30,"-" * 30)
+                    check_date_day(user,pwd)
+
+                # Search exact phrase or character
+                elif args.exact_search is not None:
+                    if args.output_report and print_header:
+                        print ("\nThe following user accounts were found to have a password that contains the word/phrase " + args.exact_search + ":")
+                    elif not args.output_report and print_header:
+                        output_pass("-" * 30,"-" * 30,"-" * 30)
+                        output_pass("Username","Password","Exact Username Searched")
+                        output_pass("-" * 30,"-" * 30,"-" * 30)
+                    check_exact_search(user,pwd,args.exact_search)
+
+                # Check for username (basic search)
+                elif args.user_search is not None:
+                    if args.output_report and print_header:
+                        print ("\nThe following user accounts were found to have a password that contains the word/phrase " + args.exact_search + ":")
+                    elif not args.output_report and print_header:
+                        output_pass("-" * 30,"-" * 30,"-" * 30)
+                        output_pass("Username","Password","Username Searched")
+                        output_pass("-" * 30,"-" * 30,"-" * 30)
+                    check_user_search(user,pwd,args.user_search)
+
+                # Check if admins have had their passwords cracked
+                elif args.admin_path is not None:
+                    if args.output_report and print_header:
+                        print ("\nThe following user accounts were identified as Domain Administrators (Domain Admins, Enterprise Admins, Administrators, etc) and were found to have weak passwords set: ")
+                    elif not args.output_report and print_header:
+                        output_pass("-" * 30,"-" * 30,"")
+                        output_pass("Username","Password","")
+                        output_pass("-" * 30,"-" * 30,"")
+                    check_admin(user,pwd)
+
+                # Check if password contains username
+                elif args.user_as_pass:
+                    if args.output_report and print_header:
+                        print ("\nThe following user accounts were found to have a variation of their username set as their account password: ")
+                    elif not args.output_report and print_header:
+                        output_pass("-" * 30,"-" * 30,"")
+                        output_pass("Username","Password","")
+                        output_pass("-" * 30,"-" * 30,"")
+                    check_user_as_pass(user,pwd)
+                
+                elif args.keyboard_pattern:
+                    if args.output_report and print_header:
+                        print ("\nThe following user accounts were identified as having passwords that utilise common keyboard patterns such as qwer, zxcvbn, qazwsx, etc.: ")
+                    elif not args.output_report and print_header:
+                        output_pass("-" * 30,"-" * 30,"")
+                        output_pass("Username","Password","")
+                        output_pass("-" * 30,"-" * 30,"")
+                    keyboard_patterns(user,pwd)
+                    
+                print_header = False # Stop showing headers if shown once before
+
+            ##### REQUIRED TO PARSE FULL LIST #####
             
+            print_header = True
+
+            # Check for password reuse between accounts
+            if args.shared_pass:
+                if args.output_report and print_header:
+                    print ("\nThe following user accounts were found to have a passwords set that are re-used within other user accounts (with '*' representing a masked character). Usually, this is a coincidence with accounts using 'standard' weak password (such as 'Password1' or 'qwerty123', however where privileged/administrative accounts are used these should be reviewed further: ")
+                elif not args.output_report and print_header:
+                    output_pass("-" * 30,"-" * 30,"-" * 30)
+                    output_pass("Username","Password","Description")
+                    output_pass("-" * 30,"-" * 30,"-" * 30)
+                check_shared_pass(full_list)
+            
+            # Generate Hashcat compatible masks from top N passwords
+            if args.masks:
+                if args.output_report is False and print_header:
+                    output_pass("-" * 30,"-" * 30,"-" * 30)
+                    output_pass("Hashcat Mask","Mask Length","Occurrences")
+                    output_pass("-" * 30,"-" * 30,"-" * 30)
+                hashcat_mask_analysis(full_list)
+
+            # Generate 'cleaned' wordlist from passwords
+            if args.clean_pass_wordlists:
+                print ("\n[*] Cleaned " + str(len(full_list)) + " words to 'wordlist-cleaned.txt'")
+                remove_end_numeric(full_list)
+
+            if args.entropy:
+                entropy_calculate(full_list)
