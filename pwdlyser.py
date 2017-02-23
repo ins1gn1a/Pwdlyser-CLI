@@ -2,7 +2,7 @@
 
 
 __author__ = "Adam Govier"
-__license__ = "GPL"
+__license__ = "MIT"
 __version__ = "2.3.3"
 __maintainer__ = "ins1gn1a"
 __status__ = "Production"
