@@ -686,9 +686,10 @@ if __name__ == "__main__":
         check_character_analysis(full_list)
         
     elif args.summary:
-        # Top 10 most used passwords
+        print ("A password audit was performed against the extracted password hashes from the specified system. Password cracking tools and methods were used to enumerate the plaintext password counterparts, and as such not all of the passwords were able to be identified. In total, there were " + str(len(full_list)) + " username and password combinations that were obtained.")
         
-        print ("As part of the password audit, the top 10 most commonly used passwords within the organisation have been compiled. This list has been broken up with the password, the percentage of the total passwords, and the numeric value of the total passwords:")
+        # Top 10 most used passwords
+        print ("\nAs part of the password audit, the top 10 most commonly used passwords within the organisation have been compiled. This list has been broken up with the password, the percentage of the total passwords, and the numeric value of the total passwords:")
         check_frequency_analysis(full_list,10)
 
         # Top 10 password lengths
