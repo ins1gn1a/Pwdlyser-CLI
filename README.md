@@ -26,11 +26,13 @@ To just identify the top [num] of passwords, i.e. frequency analysis, use the ``
 Other options can be seen within the ```-h``` menu or below:
 
 ```
+./pwdlyser.py -h
 usage: pwdlyser.py [-h] [--all] [--admin ADMIN_PATH] [-c] [--char-analysis]
                    [--date] [-e] [--exact EXACT_SEARCH] [-f FREQ_ANAL]
                    [-fl FREQ_LEN] [-k] [-l MIN_LENGTH] [-m]
                    [-mc MASKS_RESULTS_COUNT] [-o ORG_NAME] [-oR] -p PASS_LIST
                    [-S BASIC_SEARCH] [-s] [-u USER_SEARCH] [-up] [-w]
+                   [--summary]
 
 Password Analyser
 
@@ -77,6 +79,8 @@ optional arguments:
   -up, --user-as-pass   Check for passwords that use part of the username
   -w, --clean-wordlist  Enable this flag to append cleaned (no trailing
                         numerics) to a wordlist at wordlist-cleaned.txt
+  --summary             Use --summary to provide a concise report-friendly
+                        output.
 ```
 
 ## Example Outputs
