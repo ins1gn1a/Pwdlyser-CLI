@@ -3,7 +3,7 @@
 
 __author__ = "Adam Govier"
 __license__ = "MIT"
-__version__ = "2.3.3"
+__version__ = "2.4.0"
 __maintainer__ = "ins1gn1a"
 __status__ = "Production"
 
@@ -39,6 +39,7 @@ parser.add_argument('-s','--shared',dest='shared_pass',help='Display any reused/
 parser.add_argument('-u','--user',dest='user_search',help='Return usernames that match string (case insensitive)',required=False)
 parser.add_argument('-up','--user-as-pass',dest='user_as_pass',help='Check for passwords that use part of the username',required=False,action='store_true',default=False)
 parser.add_argument('-w','--clean-wordlist',dest='clean_pass_wordlists',help='Enable this flag to append cleaned (no trailing numerics) to a wordlist at wordlist-cleaned.txt',required=False,action='store_true',default=False)
+parser.add_argument('--summary',dest='summary',help='Use --summary to provide a concise report-friendly output.',required=False,action='store_true',default=False)
 args = parser.parse_args()
 
 pass_list = args.pass_list
@@ -131,6 +132,8 @@ def check_org_name(user,password,org):
     if (search in pwd_unleet):
         if args.output_report:
             print_report(user + " : " + password_masking(password))
+        elif args.summary:
+            return (password)
         else:
             output_pass(user,password,"Variation of org name " + org)
 
@@ -140,10 +143,18 @@ def reverse_leet_speak():
         leet_list = leetconf.read().splitlines()
     return leet_list
 
+# Check for user stating as password
 def check_user_as_pass(user,pwd):
     if user.rstrip() == "NONE" or user.rstrip() == "":
         return
-    check_basic_search(user,pwd,user)
+
+    if args.summary:
+        tmp = check_basic_search(user,pwd,user)
+
+        if tmp:
+            return (1)    
+    else:
+        check_basic_search(user,pwd,user)
 
 # Checks for variation of input based upon removal of leetspeak
 def check_basic_search(user,password,search):
@@ -164,6 +175,8 @@ def check_basic_search(user,password,search):
     if (search in pwd_unleet):
         if args.output_report:
             print_report(user + " : " + password_masking(password))
+        elif args.summary:
+            return True
         else:
             output_pass(user,password,"Variation of " + search)
 
@@ -173,6 +186,7 @@ def check_common_pass(user,password):
     out_issue = ""
     leet_list = reverse_leet_speak()
     pwd_unleet = password
+    tmp_summary_count = 0
 
     # Import common passwords
     with open ("pwd_common.conf") as passcommon:
@@ -196,10 +210,15 @@ def check_common_pass(user,password):
         if (common in pwd_unleet) and (x == 0):
             if args.output_report:
                 print_report(user + " : " + password_masking(password))
+            elif args.summary:
+                tmp_summary_count += 1
             else:
                 out_issue = "Variation of " + common
                 output_pass(user,password,out_issue)
                 x += 1
+
+    if args.summary:
+        return tmp_summary_count
 
 def check_date_day(user,password):
     x = 0
@@ -278,7 +297,7 @@ def check_frequency_analysis(full_list,length):
     wordfreq = (words.most_common())
 
     for pair in wordfreq:
-        if z < length and args.output_report:
+        if (z < length) and (args.output_report or args.summary):
             print_report(str(pair[0]) + " : " + str(int(pair[1] / int(len(wordfreq)) * 100)) + "%" + " | " + str(pair[1]) + "/" + str(total_pass_length))
             z += 1
         elif z < length and args.output_report is False:
@@ -299,7 +318,7 @@ def check_frequency_length(full_list,length):
     wordfreq = (words.most_common())
 
     for pair in wordfreq:
-        if z < length and args.output_report:
+        if (z < length) and (args.output_report or args.summary):
             print_report("Length : " + str(pair[0]) + " : " + str(int((pair[1] / len(pwd_list)) * 100)) + "%")
             z += 1
         elif z < length and args.output_report is False:
@@ -478,20 +497,24 @@ def hashcat_mask_analysis(full_list):
     
 def keyboard_patterns(full_list):
     keyboard_list = ["hjkl","asdf","lkjh","qwerty","qwer","zaqwsx","zaqxsw","qazwsx","qazxsw","zxc","zxcvbn","zxcdsa","1qaz","2wsx","poiuy","mnbvc","plm","nkoplm","qwer1234","2468","1357","3579","0864"]
-    
+    total_count = 0
     for x in full_list:
         count = 0
         for z in keyboard_list:
             if count > 0:
                 continue
             if z.lower() in x[1].lower():
-                
                 if args.output_report:
                     print_report(str(x[0]) + " : " + password_masking(x[1]))
                     count += 1
+                elif args.summary:
+                     total_count += 1
                 else:
                     output_pass(x[0],str(x[1]),"Keyboard Pattern " + z.rstrip())
                     count += 1
+
+    if args.summary:
+        return (total_count)
 
 def remove_end_numeric(pass_list):
     f = open('wordlist-cleaned.txt','w')
@@ -662,6 +685,65 @@ if __name__ == "__main__":
     elif args.char_anal:
         check_character_analysis(full_list)
         
+    elif args.summary:
+        # Top 10 most used passwords
+        
+        print ("As part of the password audit, the top 10 most commonly used passwords within the organisation have been compiled. This list has been broken up with the password, the percentage of the total passwords, and the numeric value of the total passwords:")
+        check_frequency_analysis(full_list,10)
+
+        # Top 10 password lengths
+        print ("\nAlongside the list of the most common passwords used within the organisation, the top 10 most common password lengths were analysed and the results can be seen below in the format of the character length, along with the percentage of the total passwords for each password length:")
+        check_frequency_length(full_list,10)
+
+        # Count of commonly seen passwords
+        common_summary_count = 0
+        for item in full_list:
+            user = item[0]
+            pwd = item[1]
+            if pwd == "":
+                pwd = "*******BLANK-PASS*******"
+            if (check_common_pass(user,pwd)) == 1:
+                common_summary_count += 1
+        if (common_summary_count > 0):
+            print ("\nOne of the biggest threats to organisations in relation to the passwords used by users and administrators is the use of passwords that are exactly the same, or a variation of the more commonly used passwords. Overall, there were " + str(common_summary_count) + " passwords that were found to have a variation of one of these common words or phrases. Some of these passwords include 'password', 'qwerty', 'starwars', 'system', 'admin', 'letmein', and 'iloveyou'. Further details can be seen within the 'pwd_common.conf' file at https://www.github.com/ins1gn1a/pwdlyser.")
+
+        # Count of collated instances of shared passwords
+        #check_shared_pass(full_list)
+
+        # Count of keyboard patterns
+        keyboard_summary_count = keyboard_patterns(full_list)
+        if keyboard_summary_count > 0:
+            print ("\nAs part of the wider password analysis, each password was assessed and compared to the commonly used keyboard patterns. These keyboard patterns are defined by the QWERTY layout, where a password is made up of characters in close proximity, such as qwer, zxcvbn, qazwsx, and so on. In total, there were " + str(keyboard_summary_count) + " passwords in use that had at least one of these variations.")
+
+        # Count of username as password variation
+        userpass_summary_count = 0
+        for item in full_list:
+            user = item[0]
+            pwd = item[1]
+            if pwd == "":
+                pwd = "*******BLANK-PASS*******"
+            
+            if (check_user_as_pass(user,pwd)) == 1:
+                userpass_summary_count += 1
+        if (userpass_summary_count > 0):
+            print ("\nThere were " + str(userpass_summary_count) + " passwords that were identified as having a password set that was a variation of the username; this includes additional prefixed or suffixed characters, substitutions within the word (i.e. 3 instead of e), or the username as it appears. Penetration testers, and more importantly attackers, will often check system or administrative accounts that have a variation of the username set as the password, and as such it is critical that organisations do not use this convention for password security." )
+            
+
+        # Count of organisation name in password 
+        # Requires -o parameter
+        if args.org_name:
+            org_summary_count = 0
+            for item in full_list:
+                user = item[0]
+                pwd = item[1]
+                if pwd == "":
+                    pwd = "*******BLANK-PASS*******"
+                if (check_org_name(user,pwd,organisation)) is not None:
+                    org_summary_count += 1
+            if (org_summary_count) > 0:
+                print ("\nThe organisation name, or a variation of the name (such as an abbreviation), " + args.org_name + " was found to appear within " + str(org_summary_count) +  " of the passwords that were able to be obtained during the password audit. For any system or administrative user accounts that have a variation of the company name as their password, it is highly recommended that the passwords are changed to prevent targeted guessing attacks.")
+
+
     else:
         # Print everything and exit
         if args.print_all:
@@ -864,4 +946,3 @@ if __name__ == "__main__":
 
         if args.entropy:
             entropy_calculate(full_list)
-            
