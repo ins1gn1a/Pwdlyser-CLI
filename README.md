@@ -210,7 +210,7 @@ of the most common user passwords, which can include 'password', 'letmein',
 
 ### Summary Output (--summary)
 
-```
+
 > pwdlyser -p sample-file.txt --summary -o SAMPLE-ORG --admin admin-user-list.txt
 
 A password audit was performed against the extracted password hashes from the specified system. Password cracking tools and methods were used to enumerate the plaintext password counterparts, and as such not all of the passwords were able to be identified. In total, there were 2448 username and password combinations that were obtained.
@@ -253,4 +253,4 @@ Finally, there were 3 Domain administrative accounts (Domain Admins, Enterprise 
 - svc-wsus : a4a*****tYc
 - user.admin2 : P4****rd2
 - user2 : P4****rd!2
-```
+
