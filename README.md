@@ -247,7 +247,7 @@ There were 10 passwords that were identified as having a password set that was a
 
 The organisation name, or a variation of the name (such as an abbreviation) 'SAMPLE-ORG' was found to appear within 14 of the passwords that were able to be obtained during the password audit. For any system or administrative user accounts that have a variation of the company name as their password, it is highly recommended that the passwords are changed to prevent targeted guessing attacks.
 
-Finally, there were 3 Domain administrative accounts (Domain Admins, Enterprise Admins, etc.) that were able to be compromised through password analysis. The account names and their respective passwords (masked) can be seen below:
+Finally, there were 5 Domain administrative accounts (Domain Admins, Enterprise Admins, etc.) that were able to be compromised through password analysis. The account names and their respective passwords (masked) can be seen below:
 - user.admin1 : Run****3!
 - sys.admin : $!x***az1
 - svc-wsus : a4a*****tYc
