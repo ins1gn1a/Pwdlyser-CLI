@@ -212,6 +212,54 @@ of the most common user passwords, which can include 'password', 'letmein',
 .
 ```
 
+### Mask Analysis
+
+One of the more useful features for active penetration testing is the ability to analyse the more common password masks for the cracked passwords, and to then reuse them within further Hashcat attacks. 
+
+```
+pwdlyser -p sample-file.txt -m
+
+  #####  #     # #####  #      #   #  ####  ###### ##### 
+  #    # #     # #    # #       # #  #      #      #    # 
+  #    # #  #  # #    # #        #    ####  #####  #    # 
+  #####  # # # # #    # #        #        # #      #####  
+  #      ##   ## #    # #        #   #    # #      #   #  
+  #      #     # #####  ######   #    ####  ###### #    # 
+
+  ---- Password analysis & reporting tool --- v2.4.2 ----
+
+[!] Running analysis with 'user:password' delimitation
+
+------------------------------:    ------------------------------     :    ------------------------------
+Hashcat Mask                  :    Mask Length                        :    Occurrences
+------------------------------:    ------------------------------     :    ------------------------------
+?u?l?l?l?l?l?l?u?d            :    9                                  :    601
+?u?l?l?l?l?d?d?d              :    8                                  :    266
+?u?l?l?l?l?l?l?d?d            :    9                                  :    152
+?u?l?l?l?l?l?l?l?l?d          :    10                                 :    132
+?u?l?l?l?l?l?l?l?l?l?d?d      :    13                                 :    72
+?u?l?l?l?l?l?l?l?l?d?d        :    11                                 :    62
+?u?l?l?l?l?d?d?d?d            :    9                                  :    55
+?l?l?l?l?l?u?u?u?u?u?d?d?d    :    13                                 :    49
+?u?l?l?l?l?l?l?l?d?s          :    10                                 :    48
+?u?l?l?l?l?l?l?d              :    8                                  :    46
+?u?l?l?l?l?l?d?d?d            :    9                                  :    42
+?u?l?l?l?l?l?d?d?d?d          :    10                                 :    38
+?u?l?l?l?l?d?d?s              :    8                                  :    30
+?u?l?l?l?l?l?l?l?l?d          :    10                                 :    29
+?u?l?l?l?l?l?l?d?d?d?d        :    11                                 :    28
+?u?l?l?l?l?l?l?l?l?l?d?d      :    12                                 :    21
+?u?l?l?l?l?l?l?d?d?d?d        :    11                                 :    20
+?u?l?l?l?d?d?d?d              :    8                                  :    19
+?u?l?l?l?l?l?l?d?d?s          :    10                                 :    19
+?u?l?l?l?l?l?l?d?d?d          :    10                                 :    19
+?u?l?l?l?l?l?l?l?d?d?d?d      :    12                                 :    17
+?u?l?l?l?l?l?d?d?s            :    9                                  :    15
+?u?l?l?l?l?l?l?l?l?d?d?d?d    :    13                                 :    13
+?u?l?l?l?l?l?l?l?d?d?s        :    11                                 :    12
+?s?l?l?l?l?l?l?l?l?d          :    10                                 :    11
+```
+
 ### Summary Output (--summary)
 
 
