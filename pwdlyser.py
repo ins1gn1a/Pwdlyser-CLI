@@ -18,7 +18,7 @@ import collections
 import math
 
 parser = argparse.ArgumentParser(description='Password Analyser')
-parser.add_argument('--all','-A',dest='print_all',help='Print only usernames',action='store_true',required=False)
+parser.add_argument('--all','-A',dest='print_all',help='Run all standard tests. Can be combined with -o [org-name], --summary, --admin [path]',action='store_true',required=False)
 parser.add_argument('--admin',dest='admin_path',help='Import line separated list of Admin usernames to check password list',required=False)
 parser.add_argument('-c','--common',dest='common_pass',help='Check against list of common passwords',action='store_true',default=False,required=False)
 parser.add_argument('--char-analysis',dest='char_anal',help='Perform character-level analysis',required=False,action='store_true',default=False)
