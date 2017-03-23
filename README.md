@@ -206,6 +206,10 @@ of the most common user passwords, which can include 'password', 'letmein',
 - user5 : Pa***ord
 - user1 : Dec****r16
 - user9 : zaq****23
+
+.
+.
+.
 ```
 
 ### Summary Output (--summary)
