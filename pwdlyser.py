@@ -3,7 +3,7 @@
 
 __author__ = "Adam Govier"
 __license__ = "MIT"
-__version__ = "2.4.1"
+__version__ = "2.4.2"
 __maintainer__ = "ins1gn1a"
 __status__ = "Production"
 
@@ -142,7 +142,14 @@ def check_org_name(user,password,org):
 
 # Imports leet config file and processes each mutation
 def reverse_leet_speak():
-    with open("pwd_leet.conf") as leetconf:
+    if (os.path.exists("/etc/pwdlyser/pwd_leet.conf")):
+        conf_pwdleet = "/etc/pwdlyser/pwd_leet.conf"
+    else:
+        try:
+            conf_pwdleet = "pwd_leet.conf"
+        except:
+            sys.exit("[!] Cannot locate pwd_leet.conf. Try running 'setup.sh' again.")
+    with open(conf_pwdleet) as leetconf:
         leet_list = leetconf.read().splitlines()
     return leet_list
 
@@ -192,7 +199,14 @@ def check_common_pass(user,password):
     tmp_summary_count = 0
 
     # Import common passwords
-    with open ("pwd_common.conf") as passcommon:
+    if (os.path.exists("/etc/pwdlyser/pwd_common.conf")):
+        conf_pwdcommon = "/etc/pwdlyser/pwd_common.conf"
+    else:
+        try:
+            conf_pwdcommon = "pwd_common.conf"
+        except:
+            sys.exit("[!] Cannot locate pwd_common.conf. Try running 'setup.sh' again.")
+    with open (conf_pwdcommon) as passcommon:
         pass_list = passcommon.read().splitlines()
 
     # Loop through common passwords list
