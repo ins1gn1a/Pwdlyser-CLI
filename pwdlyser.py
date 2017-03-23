@@ -3,7 +3,7 @@
 
 __author__ = "Adam Govier"
 __license__ = "MIT"
-__version__ = "2.4.0"
+__version__ = "2.4.1"
 __maintainer__ = "ins1gn1a"
 __status__ = "Production"
 
@@ -64,11 +64,14 @@ def import_file_to_list(path):
         out_var = file.read().splitlines()
     return out_var
 
+# Check for admin accounts (from list) that were compromised
 def check_admin(user,pwd):
     admin_list = import_file_to_list(args.admin_path)
     for admin in admin_list:
         if admin.lower().rstrip() == user.lower().rstrip():
-            if args.output_report:
+            if args.summary:
+                return (("- " + user + " : " + password_masking(pwd)))
+            elif args.output_report:
                 print_report(user + " : " + password_masking(pwd)) #  + " [Variation of '" +  + "']")
             else:
                 output_pass(user,pwd,"Admin: " + admin)
@@ -744,6 +747,22 @@ if __name__ == "__main__":
             if (org_summary_count) > 0:
                 print ("\nThe organisation name, or a variation of the name (such as an abbreviation), " + args.org_name + " was found to appear within " + str(org_summary_count) +  " of the passwords that were able to be obtained during the password audit. For any system or administrative user accounts that have a variation of the company name as their password, it is highly recommended that the passwords are changed to prevent targeted guessing attacks.")
 
+        if args.admin_path:
+            admin_summary_list = []
+            for item in full_list:
+                user = item[0]
+                pwd = item[1]
+                if pwd == "":
+                    pwd = "*******BLANK-PASS*******"
+                tmp_admin_summ_out = check_admin(user,pwd)
+                if tmp_admin_summ_out is not None:
+                    admin_summary_list.append(check_admin(user,pwd))
+
+            if len(admin_summary_list) > 0:
+                
+                print ("\nFinally, there were " + str(len(admin_summary_list)) + " Domain administrative accounts (Domain Admins, Enterprise Admins, etc.) that were able to be compromised through password analysis. The account names and their respective passwords (masked) can be seen below:")
+                for admin_summary_pass in admin_summary_list:
+                    print (admin_summary_pass)
 
     else:
         # Print everything and exit
