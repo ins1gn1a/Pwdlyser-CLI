@@ -3,7 +3,7 @@
 
 __author__ = "Adam Govier"
 __license__ = "MIT"
-__version__ = "2.4.2"
+__version__ = "2.4.3"
 __maintainer__ = "ins1gn1a"
 __status__ = "Production"
 
@@ -24,7 +24,7 @@ group.add_argument('-p','--pass-list',dest='pass_list',help='Enter the path to t
 
 summary_group = parser.add_mutually_exclusive_group(required=False)
 summary_group.add_argument('--all','-A',dest='print_all',help='Run all standard tests and display the output in format aimed at a more technical audience. Can be combined with -o [org-name], --summary, --admin [path]',action='store_true',required=False)
-summary_group.add_argument('-oR',dest='output_report',help='Display a descriptive output that is suitable for a more technical audience. This output provides usernames and partially-masked passwords, and can be used with any of the individual tests (such as -e, -m, -c, etc.)',action='store_true',default=False,required=False)
+summary_group.add_argument('--report','-oR',dest='output_report',help='Display a descriptive output that is suitable for a more technical audience. This output provides usernames and partially-masked passwords, and can be used with any of the individual tests (such as -e, -m, -c, etc.)',action='store_true',default=False,required=False)
 summary_group.add_argument('--summary',dest='summary',help='Use --summary to provide a descriptive management-summary output.',required=False,action='store_true',default=False)
 
 parser.add_argument('--admin',dest='admin_path',help='Import a line separated list of administrator usernames (Domain Admins, Enterprise Admins, etc.) to check against the cracked password list',required=False)
