@@ -3,7 +3,7 @@
 
 __author__ = "Adam Govier"
 __license__ = "MIT"
-__version__ = "2.4.3"
+__version__ = "2.4.4"
 __maintainer__ = "ins1gn1a"
 __status__ = "Production"
 
@@ -709,14 +709,14 @@ if __name__ == "__main__":
         check_character_analysis(full_list)
         
     elif args.summary:
-        print ("A password audit was performed against the extracted password hashes from the specified system. Password cracking tools and methods were used to enumerate the plaintext password counterparts, and as such not all of the passwords were able to be identified. In total, there were " + str(len(full_list)) + " username and password combinations that were obtained.")
+        print ("A password audit was performed against the extracted password hashes. Password cracking methods and tools were used to enumerate the plaintext password counterparts, and as such not all of the passwords were able to be identified. In total, there were " + str(len(full_list)) + " username and password combinations that were obtained and have been analysed.")
         
         # Top 10 most used passwords
         print ("\nAs part of the password audit, the top 10 most commonly used passwords within the organisation have been compiled. This list has been broken up with the password, the percentage of the total passwords, and the numeric value of the total passwords:")
         check_frequency_analysis(full_list,10)
 
         # Top 10 password lengths
-        print ("\nAlongside the list of the most common passwords used within the organisation, the top 10 most common password lengths were analysed and the results can be seen below in the format of the character length, along with the percentage of the total passwords for each password length:")
+        print ("\nAlongside the list of the most common passwords used within the organisation, the top 10 most common password lengths were analysed and the results can be seen below in the format of the character length and the percentage of the total passwords for each respective password length:")
         check_frequency_length(full_list,10)
 
         # Count of commonly seen passwords
@@ -729,7 +729,7 @@ if __name__ == "__main__":
             if (check_common_pass(user,pwd)) == 1:
                 common_summary_count += 1
         if (common_summary_count > 0):
-            print ("\nOne of the biggest threats to organisations in relation to the passwords used by users and administrators is the use of passwords that are exactly the same, or a variation of the more commonly used passwords. Overall, there were " + str(common_summary_count) + " passwords that were found to have a variation of one of these common words or phrases. Some of these passwords include 'password', 'qwerty', 'starwars', 'system', 'admin', 'letmein', and 'iloveyou'. Further details can be seen within the 'pwd_common.conf' file at https://www.github.com/ins1gn1a/pwdlyser.")
+            print ("\nOne of the biggest threats to organisations in relation to passwords used by users and administrators is the use of passwords that are the same, or a variation of commonly used passwords and phrases. Overall, there were " + str(common_summary_count) + " passwords that were found to have a variation of one of these common words or phrases. Some of these passwords are based on the words 'password', 'qwerty', 'starwars', 'system', 'admin', 'letmein', and 'iloveyou'. Further details can be seen within the 'pwd_common.conf' file at https://www.github.com/ins1gn1a/pwdlyser.")
 
         # Count of collated instances of shared passwords
         #check_shared_pass(full_list)
@@ -737,7 +737,7 @@ if __name__ == "__main__":
         # Count of keyboard patterns
         keyboard_summary_count = keyboard_patterns(full_list)
         if keyboard_summary_count > 0:
-            print ("\nAs part of the wider password analysis, each password was assessed and compared to the commonly used keyboard patterns. These keyboard patterns are defined by the QWERTY layout, where a password is made up of characters in close proximity, such as qwer, zxcvbn, qazwsx, and so on. In total, there were " + str(keyboard_summary_count) + " passwords in use that had at least one of these variations.")
+            print ("\nAs part of the wider password analysis, each password was assessed and compared to common keyboard patterns. These keyboard patterns were defined by the QWERTY layout, where a password is made up of characters in close proximity such as 'qwer', 'zxcvbn', and 'qazwsx' as an example. In total, there were " + str(keyboard_summary_count) + " passwords in use that had at least one of these or other variations.")
 
         # Count of username as password variation
         userpass_summary_count = 0
@@ -750,8 +750,7 @@ if __name__ == "__main__":
             if (check_user_as_pass(user,pwd)) == 1:
                 userpass_summary_count += 1
         if (userpass_summary_count > 0):
-            print ("\nThere were " + str(userpass_summary_count) + " passwords that were identified as having a password set that was a variation of the username; this includes additional prefixed or suffixed characters, substitutions within the word (i.e. 3 instead of e), or the username as it appears. Penetration testers, and more importantly attackers, will often check system or administrative accounts that have a variation of the username set as the password, and as such it is critical that organisations do not use this convention for password security." )
-            
+            print ("\nThere were " + str(userpass_summary_count) + " passwords that were identified as having a password set that was a variation of the username; this includes additional prefixed or suffixed characters, substitutions within the word (i.e. 3 instead of e), or the username as it appears. Penetration testers, and more importantly attackers, will often check system or administrative accounts that have a variation of the username set as the password and as such it is critical that organisations do not use this convention for password security." )            
 
         # Count of organisation name in password 
         # Requires -o parameter
@@ -780,7 +779,7 @@ if __name__ == "__main__":
 
             if len(admin_summary_list) > 0:
                 
-                print ("\nFinally, there were " + str(len(admin_summary_list)) + " Domain administrative accounts (Domain Admins, Enterprise Admins, etc.) that were able to be compromised through password analysis. The account names and their respective passwords (masked) can be seen below:")
+                print ("\nFinally, there were " + str(len(admin_summary_list)) + " administrative accounts (based upon 'Domain Admins', 'Enterprise Admins', etc.) that were able to be compromised. The account names and their respective passwords (masked) can be seen below:")
                 for admin_summary_pass in admin_summary_list:
                     print (admin_summary_pass)
 
