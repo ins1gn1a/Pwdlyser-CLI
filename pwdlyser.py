@@ -3,7 +3,7 @@
 
 __author__ = "Adam Govier"
 __license__ = "MIT"
-__version__ = "2.4.6"
+__version__ = "2.4.7"
 __maintainer__ = "ins1gn1a"
 __status__ = "Production"
 
@@ -321,7 +321,11 @@ def check_frequency_analysis(full_list,length):
 
     for pair in wordfreq:
         if (z < length) and (args.output_report or args.summary):
-            print_report(str(pair[0]) + " : " + str(int(pair[1] / int(len(full_list)) * 100)) + "%" + " | " + str(pair[1]) + "/" + str(total_pass_length))
+            if int(pair[1] / int(len(full_list)) * 100) == 0:
+                percent_out = (" <= 1")
+            else:
+                percent_out = int(pair[1] / int(len(full_list)) * 100)
+            print_report(str(pair[0]) + " : " + str(percent_out) + "%" + " | " + str(pair[1]) + "/" + str(total_pass_length))
             z += 1
         elif z < length and args.output_report is False:
             output_pass(pair[0],str(pair[1]),"")
