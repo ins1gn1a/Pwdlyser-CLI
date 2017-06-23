@@ -1,12 +1,10 @@
 #! /usr/bin/env python3
 
-
 __author__ = "Adam Govier"
 __license__ = "MIT"
-__version__ = "2.5.0"
+__version__ = "2.5.1"
 __maintainer__ = "ins1gn1a"
 __status__ = "Production"
-
 
 import sys, os
 import argparse
@@ -35,6 +33,7 @@ parser.add_argument('-e','--entropy',dest='entropy',help='Output the estimated e
 parser.add_argument('--exact',dest='exact_search',help='Perform a search using an exact input string',required=False)
 parser.add_argument('-f','--frequency',dest='freq_anal',help='Perform analysis of the frequency of the top N passwords. Usage example: "-f 10"',required=False,type=int)
 parser.add_argument('-fl','--length-frequency',dest='freq_len',help='Perform analysis on the most frequently used password lengths. Usage example: "-fl 15"',required=False,type=int)
+parser.add_argument('--hashes',dest='hashes',help='Allows for the password reuse argument (-r / --reuse) to utilise hashes in the form of USER:HASH:PASSWORD',action='store_true',default=False)
 parser.add_argument('-k','--keyboard-pattern',dest='keyboard_pattern',help='Identify common keyboard pattern usage within password lists, such as passwords using "zxc123"',required=False,action='store_true',default=False)
 parser.add_argument('-l','--length',dest='min_length',help='Display passwords that do not meet the minimum length specified. Usage example: "-l 8"',type=int,required=False)
 parser.add_argument('-m','--mask',dest='masks',help='Display the most commonly used Hashcat masks. This is extremely useful for further cracking attacks',action='store_true',required=False,default=False)
@@ -64,6 +63,20 @@ banner = banner + "  #      ##   ## #    # #        #   #    # #      #   #  \n"
 banner = banner + "  #      #     # #####  ######   #    ####  ###### #    # \n\n"
 banner = banner + "  ---- Password analysis & reporting tool --- v" + __version__ + " ----\n"
 
+def update_check():
+
+    try:
+        import urllib
+        from urllib import request
+        raw_update_data = urllib.request.urlopen("https://raw.githubusercontent.com/ins1gn1a/pwdlyser/master/pwdlyser.py").read(200)
+        update_data = (raw_update_data.decode()).split("\n")
+        for line in update_data:
+            if "__version__" in line:
+                v_check = str(line.split('"')[1])
+                if str(__version__) != v_check:
+                    print ("[!] New version of pwdlyser (v " + v_check + ") is available on GitHub: https://wwww.github.com/ins1gn1a/pwdlyser \n")
+    except:
+        print ("[!] Auto-update check not performed. Please check for a new version manually at https://www.github.com/ins1gn1a/pwdlyser \n")
 
 # Input function
 def import_file_to_list(path):
@@ -683,8 +696,10 @@ if __name__ == "__main__":
 
     print (banner)
 
+    update_check()
+
     if int(columns) < 110:
-        sys.exit("Warning: Resize your terminal to be at least 110 columns wide. Currently it is " + columns + " columns wide.")
+        sys.exit("[!] Warning: Resize your terminal to be at least 110 columns wide. Currently it is " + columns + " columns wide.")
 
     # Retrieve list
     full_list = (delimit_list(pass_list))
