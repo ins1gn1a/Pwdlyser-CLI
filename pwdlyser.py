@@ -814,16 +814,19 @@ if __name__ == "__main__":
         # Requires -o parameter
         if args.org_name:
             org_summary_count = 0
+            output_org_name = []
             for item in full_list:
                 user = item[0]
                 pwd = item[1]
                 if pwd == "":
                     pwd = "*******BLANK-PASS*******"
                 if (check_org_name(user,pwd,organisation)) is not None:
+                    output_org_name.append("- " + user + " : " + password_masking(pwd))
                     org_summary_count += 1
             if (org_summary_count) > 0:
                 print ("\nThe organisation name, or a variation of the name (such as an abbreviation), " + args.org_name + " was found to appear within " + str(org_summary_count) +  " of the passwords that were able to be obtained during the password audit. For any system or administrative user accounts that have a variation of the company name as their password, it is highly recommended that the passwords are changed to prevent targeted guessing attacks.")
-
+                for u in output_org_name:
+                    print (u)
 
         print ("\nThe following accounts were found to share the same password between similarly named accounts. These are believed to be service accounts or individual user accounts that are operated by the same user. Password re-use should be investigated as when a password is reused between a low privileged and a high privileged account it can lead to a compromise of systems that the high privileged account is authorised to access:")
         check_reuse_pass(full_list,'summary')
@@ -939,16 +942,19 @@ if __name__ == "__main__":
         # Requires -o parameter
         if args.org_name:
             org_summary_count = 0
+            output_org_name = []
             for item in full_list:
                 user = item[0]
                 pwd = item[1]
                 if pwd == "":
                     pwd = "*******BLANK-PASS*******"
                 if (check_org_name(user,pwd,organisation)) is not None:
+                    output_org_name.append("- " + user + " : " + password_masking(pwd))
                     org_summary_count += 1
             if (org_summary_count) > 0:
                 print ("\nThe organisation name, or a variation of the name (such as an abbreviation), " + args.org_name + " was found to appear within " + str(org_summary_count) +  " of the passwords that were able to be obtained during the password audit. For any system or administrative user accounts that have a variation of the company name as their password, it is highly recommended that the passwords are changed to prevent targeted guessing attacks.")
-
+                for u in output_org_name:
+                    print (u)
 
         # Check for passwords via unleeted search
         if args.basic_search is not None:
