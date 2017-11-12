@@ -2,7 +2,7 @@
 
 __author__ = "Adam Govier"
 __license__ = "MIT"
-__version__ = "2.5.1"
+__version__ = "2.5.2"
 __maintainer__ = "ins1gn1a"
 __status__ = "Production"
 
@@ -921,6 +921,7 @@ if __name__ == "__main__":
                 keyboard_patterns(full_list)
 
             sys.exit() # Skip analysis functions below
+            
 
         # Check for passwords that don't meet Min Length
         if (args.min_length is not None):
@@ -934,17 +935,20 @@ if __name__ == "__main__":
                     pwd = "*******BLANK-PASS*******"
                 check_min_length(pwd,args.min_length)
 
-        # Check if Org name (or slight variation) is in list
-        if organisation is not None:
-            if args.output_report and org_count == 0:
-                print ("\nThe organisation name " + organisation + " appears within several passwords for the following accounts (within some variation):")
-                org_count += 1
+        # Count of organisation name in password
+        # Requires -o parameter
+        if args.org_name:
+            org_summary_count = 0
             for item in full_list:
                 user = item[0]
                 pwd = item[1]
                 if pwd == "":
                     pwd = "*******BLANK-PASS*******"
-                check_org_name(user,pwd,organisation)
+                if (check_org_name(user,pwd,organisation)) is not None:
+                    org_summary_count += 1
+            if (org_summary_count) > 0:
+                print ("\nThe organisation name, or a variation of the name (such as an abbreviation), " + args.org_name + " was found to appear within " + str(org_summary_count) +  " of the passwords that were able to be obtained during the password audit. For any system or administrative user accounts that have a variation of the company name as their password, it is highly recommended that the passwords are changed to prevent targeted guessing attacks.")
+
 
         # Check for passwords via unleeted search
         if args.basic_search is not None:
