@@ -824,7 +824,7 @@ if __name__ == "__main__":
                     output_org_name.append("- " + user + " : " + password_masking(pwd))
                     org_summary_count += 1
             if (org_summary_count) > 0:
-                print ("\nThe organisation name, or a variation of the name (such as an abbreviation), " + args.org_name + " was found to appear within " + str(org_summary_count) +  " of the passwords that were able to be obtained during the password audit. For any system or administrative user accounts that have a variation of the company name as their password, it is highly recommended that the passwords are changed to prevent targeted guessing attacks.")
+                print ("\nThe organisation name, or a variation of the name (such as an abbreviation) '" + args.org_name + "' was found to appear within " + str(org_summary_count) +  " of the passwords that were able to be obtained during the password audit. For any system or administrative user accounts that have a variation of the company name as their password, it is highly recommended that the passwords are changed to prevent targeted guessing attacks.")
                 for u in output_org_name:
                     print (u)
 
@@ -907,6 +907,22 @@ if __name__ == "__main__":
                 if pwd == "":
                     pwd = "*******BLANK-PASS*******"
                 check_date_day(user,pwd)
+                
+            # Count of organisation name in password
+            # Requires -o parameter
+            if args.org_name:
+                org_summary_count = 0
+                output_org_name = []
+                for item in full_list:
+                    user = item[0]
+                    pwd = item[1]
+                    if pwd == "":
+                        pwd = "*******BLANK-PASS*******"
+                    if (check_org_name(user,pwd,organisation)) is not None:
+                        output_org_name.append("- " + user + " : " + password_masking(pwd))
+                        org_summary_count += 1
+                if (org_summary_count) > 0:
+                    print ("\nThe organisation name, or a variation of the name (such as an abbreviation) '" + args.org_name + "' was found to appear within " + str(org_summary_count) +  " of the passwords that were able to be obtained during the password audit. For any system or administrative user accounts that have a variation of the company name as their password, it is highly recommended that the passwords are changed to prevent targeted guessing attacks.")
 
             if args.output_report and common_count == 0:
                 print ("\nThe following user accounts were found to have a password that was a variation of the most common user passwords, which can include 'password', 'letmein', '123456', 'admin', 'iloveyou', 'friday', or 'qwerty':")
@@ -952,7 +968,7 @@ if __name__ == "__main__":
                     output_org_name.append("- " + user + " : " + password_masking(pwd))
                     org_summary_count += 1
             if (org_summary_count) > 0:
-                print ("\nThe organisation name, or a variation of the name (such as an abbreviation), " + args.org_name + " was found to appear within " + str(org_summary_count) +  " of the passwords that were able to be obtained during the password audit. For any system or administrative user accounts that have a variation of the company name as their password, it is highly recommended that the passwords are changed to prevent targeted guessing attacks.")
+                print ("\nThe organisation name, or a variation of the name (such as an abbreviation) '" + args.org_name + "' was found to appear within " + str(org_summary_count) +  " of the passwords that were able to be obtained during the password audit. For any system or administrative user accounts that have a variation of the company name as their password, it is highly recommended that the passwords are changed to prevent targeted guessing attacks.")
                 for u in output_org_name:
                     print (u)
 
