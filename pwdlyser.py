@@ -2,7 +2,7 @@
 
 __author__ = "Adam Govier"
 __license__ = "MIT"
-__version__ = "2.5.2"
+__version__ = "2.6.0"
 __maintainer__ = "ins1gn1a"
 __status__ = "Production"
 
@@ -273,6 +273,11 @@ def check_date_day(user,password):
                 output_pass(user,password,out_issue)
                 x += 1
 
+def hex_decode_pwd(pwd):
+    if "$HEX[" in pwd:
+        return (pwd.decode("hex"))
+    else:
+        return (pwd)
 
 # output and delimit input list
 def delimit_list(list):
@@ -301,10 +306,12 @@ def delimit_list(list):
             # Delimits with hash username:hash:password or username:password
             if n != 0:
                 try: # Try to delimit user:hash:password
-                    list_stuff = [list_entry.split(":",2)[0],list_entry.split(":",2)[2]]
+                    list_pwd = hex_decode_pwd(list_entry.split(":",2)[2])
+                    list_stuff = [list_entry.split(":",2)[0],list_pwd]
                 except: # Except try user:password
                     try:
-                        list_stuff = [list_entry.split(":",2)[0],list_entry.split(":",2)[1]]
+                        list_pwd = list_entry.split(":",2)[1]
+                        list_stuff = [list_entry.split(":",2)[0],list_pwd]
                     except: # Everything has gone wrong
                         print ("[!] Can't split input line: " + str(file_line_count))
             else:
