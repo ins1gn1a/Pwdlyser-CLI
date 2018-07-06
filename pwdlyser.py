@@ -275,7 +275,7 @@ def check_date_day(user,password):
 
 def hex_decode_pwd(pwd):
     if "$HEX[" in pwd:
-        return (pwd.decode("hex"))
+        return (bytes.fromhex(pwd[5:-1]).decode("utf-8"))
     else:
         return (pwd)
 
