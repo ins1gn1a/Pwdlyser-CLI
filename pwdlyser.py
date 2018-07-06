@@ -314,8 +314,14 @@ def delimit_list(list):
                         list_stuff = [list_entry.split(":",2)[0],list_pwd]
                     except: # Everything has gone wrong
                         print ("[!] Can't split input line: " + str(file_line_count))
+                        
             else:
-                list_stuff = list_entry.split(":",1)
+                try:
+                    list_both = list_entry.split(":",1)
+                    list_pwd = (hex_decode_pwd(list_both[1]))
+                    list_stuff = (list_both[0],list_pwd)
+                except:
+                     continue
             if (len(list_stuff)) == 1: # Can't remember what this does
                 list_stuff.append("")
             out_list.append(list_stuff)
