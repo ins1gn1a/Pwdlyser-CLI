@@ -4,7 +4,7 @@ The 'pwdlyser' tool is a Python-based CLI script that automates the arduous proc
 ## Installation
 The installation of this tool is fairly straight forward. Use the following steps:
 ```
-git clone https://www.github.com/ins1gn1a/pwdlyser.git
+git clone https://github.com/ins1gn1a/Pwdlyser-CLI.git
 cd pwdlyser/
 chmod +x setup.sh
 ./setup.sh
