@@ -2,10 +2,8 @@
 The 'pwdlyser' tool is a Python-based CLI script that automates the arduous process of manually reviewing cracked passwords during password audits following security assessments or penetration tests. There are likely some false positives/negatives, so please use at your own discretion.
 
 ## Installation
-The installation of this tool is fairly straight forward. Use the following steps:
+The installation of this tool is fairly straight forward. Clone the repo and use the following steps:
 ```
-git clone https://www.github.com/ins1gn1a/pwdlyser.git
-cd pwdlyser/
 chmod +x setup.sh
 ./setup.sh
 ```
